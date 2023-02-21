@@ -1,0 +1,28 @@
+{
+  "name": "college-predictor-be",
+  "version": "1.0.0",
+  "description": "A College Predictor backend application",
+  "main": "server.js",
+  "author": "krish",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.17.1",
+    "express-jwt": "^6.1.0",
+    "express-validator": "^6.13.0",
+    "formidable": "^2.1.1",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^6.3.0",
+    "mongoose": "^6.8.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "pm2": "^5.2.2"
+  }
+}
