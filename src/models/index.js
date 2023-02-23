@@ -4,35 +4,39 @@ const josaSchema = new mongoose.Schema(
 	{
 		instituteType: {
 			type: String,
-			required: true
+			required: true,
+			trim: true
 		},
 		instituteName: {
 			type: String,
-			required: true
+			required: true,
+			trim: true
 		},
 		programName: {
 			type: String,
-			required: true
+			required: true,
+			trim: true
 		},
 		seatType: {
 			type: String,
-			required: true
+			required: true,
+			trim: true
 		},
 		quota: {
 			type: String,
-			required: true
+			required: true,
+			trim: true
 		},
 		gender: {
 			type: String,
-			required: true
+			required: true,
+			trim: true
 		},
 		openingRank: {
-			type: String,
-			required: true
+			type: Number
 		},
 		closingRank: {
-			type: String,
-			required: true
+			type: Number
 		},
 		round: {
 			type: Number,

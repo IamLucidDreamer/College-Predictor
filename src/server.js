@@ -19,8 +19,8 @@ const route = require('./routes/index')
 const { validationResult } = require('express-validator')
 
 //testing
-app.get('/forecast-api', (_, res) => {
-	res.send('Hello from forecast microservice!')
+app.get('/api', (_, res) => {
+	res.send('Hello from college predictor BE!')
 })
 
 //validate req
