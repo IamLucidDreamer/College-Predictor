@@ -28,12 +28,12 @@ const bulkUpload = async (req, res) => {
 								instituteType: val?.[0],
 								instituteName: val?.[1],
 								programName: val?.[2],
-								seatType: val?.[3],
-								quota: val?.[4],
+								quota: val?.[3],
+								seatType: val?.[4],
 								gender: val?.[5],
-								openingRank: val?.[6],
-								closingRank: val?.[7],
-								round: 1
+								openingRank: typeof val?.[6] === 'number' ? val?.[6] : null,
+								closingRank: typeof val?.[7] === 'number' ? val?.[7] : null,
+								round: val?.[8]
 							}))
 
 						josaSchema.insertMany(arr).then(data => {
@@ -53,6 +53,49 @@ const bulkUpload = async (req, res) => {
 	}
 }
 
+const predictJosa = async (req, res) => {
+	try {
+		const body = req.body
+		const arr = []
+		for (a in req.body) {
+			if (body[a]?.length) {
+				arr.push({
+					[a]: {
+						$exists: true,
+						$in: body[a]
+					}
+				})
+			}
+		}
+		josaSchema
+			.aggregate([
+				{
+					$match: {
+						$and: arr
+					}
+				}
+			])
+			.then(data => {
+				if (body.rank) {
+					res.status(200).json({
+						status: 'SUCCESS',
+						data: data.filter(val => val.closingRank >= body.rank)
+					})
+				} else {
+					res.status(200).json({
+						status: 'SUCCESS',
+						data
+					})
+				}
+			})
+	} catch (err) {
+		loggerUtil(err, 'ERROR')
+	} finally {
+		loggerUtil('Predictor function is executed!')
+	}
+}
+
 module.exports = {
-	bulkUpload
+	bulkUpload,
+	predictJosa
 }
