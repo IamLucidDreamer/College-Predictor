@@ -16,6 +16,8 @@ const logger = loggerUtil
 mongo()
 
 const route = require('./routes/index')
+const auth = require('./routes/auth')
+const user = require('./routes/user')
 const { validationResult } = require('express-validator')
 
 //testing
@@ -40,6 +42,8 @@ app.use(helmet())
 app.use(cors())
 
 app.use('/api', route)
+app.use('/api', auth)
+app.use('/api', user)
 
 //connection
 const PORT = 8003
