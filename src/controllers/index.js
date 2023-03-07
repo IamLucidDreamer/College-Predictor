@@ -95,7 +95,30 @@ const predictJosa = async (req, res) => {
 	}
 }
 
+const getDropdownValues = async (req, res) => {
+	const key = req.query.key
+	try {
+		await josaSchema.distinct(key, (err, data) => {
+			if (err) {
+				logger(err, 'ERROR')
+				return res.status(SC.BAD_REQUEST).json({
+					error: 'Problem while fetching dropdown values!'
+				})
+			}
+			res.status(200).json({
+				status: 'SUCCESS',
+				data
+			})
+		})
+	} catch (err) {
+		loggerUtil(err, 'ERROR')
+	} finally {
+		loggerUtil('Get Drop Down Values function is executed!')
+	}
+}
+
 module.exports = {
 	bulkUpload,
-	predictJosa
+	predictJosa,
+	getDropdownValues
 }
