@@ -2,7 +2,7 @@ const formidable = require('formidable')
 const fs = require('fs')
 const readXlsxFile = require('read-excel-file/node')
 const josaSchema = require('../models/index')
-const { loggerUtil } = require('../utils/logger')
+const { loggerUtil: logger } = require('../utils/logger')
 
 const bulkUpload = async (req, res) => {
 	const form = new formidable.IncomingForm()
@@ -47,9 +47,9 @@ const bulkUpload = async (req, res) => {
 			}
 		})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
-		loggerUtil('Create Bucket Function is Executed!')
+		logger('Create Bucket Function is Executed!')
 	}
 }
 
@@ -58,7 +58,7 @@ const predictJosa = async (req, res) => {
 		const body = req.body
 		const arr = []
 		for (a in req.body) {
-			if (body[a]?.length) {
+			if (body[a]?.length && a !== "rank") {
 				arr.push({
 					[a]: {
 						$exists: true,
@@ -89,9 +89,9 @@ const predictJosa = async (req, res) => {
 				}
 			})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
-		loggerUtil('Predictor function is executed!')
+		logger('Predictor function is executed!')
 	}
 }
 
@@ -111,9 +111,9 @@ const getDropdownValues = async (req, res) => {
 			})
 		})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
-		loggerUtil('Get Drop Down Values function is executed!')
+		logger('Get Drop Down Values function is executed!')
 	}
 }
 

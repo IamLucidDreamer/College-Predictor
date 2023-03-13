@@ -14,7 +14,7 @@ const signup = async (req, res) => {
 	}
 	const { email } = req.body
 	try {
-		await userModel.findOne({ email }, async (err, user) => {
+		userModel.findOne({ email }).exec((err, user) => {
 			if (err || user) {
 				return res.status(SC.WRONG_ENTITY).json({
 					error: 'E-Mail already has been registered!',
@@ -25,6 +25,7 @@ const signup = async (req, res) => {
 				user.save((err, user) => {
 					if (err) {
 						return res.status(SC.BAD_REQUEST).json({
+							err: err,
 							error: 'Failed to add user in DB!'
 						})
 					}

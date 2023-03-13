@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			maxlength: 32,
 			trim: true,
-			required: true
+			// required: true
 		},
 		lastname: {
 			type: String,
@@ -19,12 +19,12 @@ const userSchema = new mongoose.Schema(
 		dateOfBirth: {
 			type: String,
 			trim: true,
-			required: true
+			// required: true
 		},
 		gender: {
 			type: String,
 			enum: ['male', 'female'],
-			required: true
+			// required: true
 		},
 		email: {
 			type: String,
