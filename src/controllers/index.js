@@ -96,20 +96,51 @@ const predictJosa = async (req, res) => {
 }
 
 const getDropdownValues = async (req, res) => {
-	const key = req.query.key
+	let mapObj = {},
+		groupObj = {}
+	const body = req.body
+	for (const key in body) {
+		mapObj = {
+			...mapObj,
+			...(body[key].length
+				? {
+						...{
+							[key]: {
+								$in: body[key]
+							}
+						}
+				  }
+				: {})
+		}
+		groupObj = {
+			...groupObj,
+			[key]: '$' + key
+		}
+	}
 	try {
-		await josaSchema.distinct(key, (err, data) => {
-			if (err) {
-				logger(err, 'ERROR')
-				return res.status(SC.BAD_REQUEST).json({
-					error: 'Problem while fetching dropdown values!'
+		await josaSchema
+			.aggregate([
+				{
+					$match: {
+						...mapObj
+					}
+				},
+				{
+					$group: {
+						_id: {
+							...groupObj
+						}
+					}
+				}
+			])
+			.then(data => {
+				res.status(200).json({
+					status: 'SUCCESS',
+					data: data.map(val => ({
+						...val?._id
+					}))
 				})
-			}
-			res.status(200).json({
-				status: 'SUCCESS',
-				data
 			})
-		})
 	} catch (err) {
 		loggerUtil(err, 'ERROR')
 	} finally {
