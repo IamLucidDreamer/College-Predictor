@@ -3,7 +3,7 @@ const expressJwt = require('express-jwt')
 const { statusCode: SC } = require('../utils/statusCode')
 
 const isSignedIn = expressJwt({
-	secret: process.env.SECRET || "dummy",
+	secret: process.env.SECRET || 'dummy',
 	algorithms: ['HS256', 'RS256'],
 	userProperty: 'auth'
 })
