@@ -18,6 +18,8 @@ mongo()
 const route = require('./routes/index')
 const auth = require('./routes/auth')
 const user = require('./routes/user')
+const blog = require('./routes/blog')
+const updates = require('./routes/updates')
 const { validationResult } = require('express-validator')
 
 //testing
@@ -44,6 +46,8 @@ app.use(cors())
 app.use('/api', route)
 app.use('/api', auth)
 app.use('/api', user)
+app.use('/api', blog)
+app.use('/api', updates)
 
 //connection
 const PORT = 8003
