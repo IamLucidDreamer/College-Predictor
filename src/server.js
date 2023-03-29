@@ -23,7 +23,7 @@ const updates = require('./routes/updates')
 const { validationResult } = require('express-validator')
 
 //testing
-app.get('/api', (_, res) => {
+app.get('/college-api', (_, res) => {
 	res.send('Hello from college predictor BE!')
 })
 
@@ -43,11 +43,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(helmet())
 app.use(cors())
 
-app.use('/api', route)
-app.use('/api', auth)
-app.use('/api', user)
-app.use('/api', blog)
-app.use('/api', updates)
+app.use('/college-api', route)
+app.use('/college-api', auth)
+app.use('/college-api', user)
+app.use('/college-api', blog)
+app.use('/college-api', updates)
 
 //connection
 const PORT = 8004
