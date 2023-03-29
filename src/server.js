@@ -50,7 +50,7 @@ app.use('/api', blog)
 app.use('/api', updates)
 
 //connection
-const PORT = 8003
+const PORT = 8004
 
 app.listen(PORT, () => {
 	logger(`Listening on port------ ${PORT}`, 'SERVER')
