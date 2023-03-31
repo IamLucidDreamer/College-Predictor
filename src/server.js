@@ -21,6 +21,7 @@ const user = require('./routes/user')
 const blog = require('./routes/blog')
 const updates = require('./routes/updates')
 const { validationResult } = require('express-validator')
+const { createSiteData } = require('./helpers/fileHelper')
 
 //testing
 app.get('/api', (_, res) => {
@@ -43,11 +44,14 @@ app.use(express.urlencoded({ extended: true }))
 app.use(helmet())
 app.use(cors())
 
+app.post("/api/document" , createSiteData)
+
 app.use('/api', route)
 app.use('/api', auth)
 app.use('/api', user)
 app.use('/api', blog)
 app.use('/api', updates)
+
 
 //connection
 const PORT = 8004
