@@ -65,7 +65,13 @@ const signup = async (req, res) => {
 			} else {
 				const user = new userModel(req.body)
 				user.save((err, user) => {
-
+					if (err) {
+						return res.status(SC.BAD_REQUEST).json({
+							err: err,
+							error: 'Failed to add user in DB!'
+						})
+					}
+					
 					const expiryTime = new Date()
 					expiryTime.setMonth(expiryTime.getMonth() + 6)
 					const exp = parseInt(expiryTime.getTime() / 1000)
@@ -74,12 +80,6 @@ const signup = async (req, res) => {
 					user.salt = undefined
 					user.__v = undefined
 
-					if (err) {
-						return res.status(SC.BAD_REQUEST).json({
-							err: err,
-							error: 'Failed to add user in DB!'
-						})
-					}
 					res.status(SC.OK).json({
 						message: 'User Signed Up, Successfully!',
 						data: user,

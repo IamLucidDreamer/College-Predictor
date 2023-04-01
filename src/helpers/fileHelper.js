@@ -1,7 +1,7 @@
 const dotenv = require('dotenv')
 const formidable = require('formidable')
 const { loggerUtil: logger } = require("../utils/logger")
-const { S3Client, PutObjectAclCommand,PutObjectCommand  } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectAclCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
 const fs = require("fs")
 
 dotenv.config()
@@ -44,12 +44,12 @@ const createSiteData = async (req, res) => {
                     }
                     const fileName = file.originalFilename
                     const client = new S3Client({
-                        region: 'ap-south-1', 
+                        region: 'ap-south-1',
                         credentials: {
-                        accessKeyId: process.env.ACCESS_KEY,
-                        secretAccessKey: process.env.ACCESS_SECRET
-                }
-            })
+                            accessKeyId: process.env.ACCESS_KEY,
+                            secretAccessKey: process.env.ACCESS_SECRET
+                        }
+                    })
                     const bucketParams = {
                         Bucket: process.env.BUCKET_NAME,
                         Key: fileName,
@@ -68,22 +68,23 @@ const createSiteData = async (req, res) => {
                                 )
                                 .then(async response => {
                                     if (response.$metadata.httpStatusCode === 200) {
-                                        await create(prisma.siteData, {
-                                            ...data,
-                                            siteFileLink: `https://${process.env.BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${fileName}`
-                                        })
-                                            .then(value => {
-                                                return res.status(SC.OK).json({
-                                                    message: 'Site data created successfully!',
-                                                    data: value
-                                                })
-                                            })
-                                            .catch(err => {
-                                                logger(err, 'ERROR')
-                                                return res.status(SC.BAD_REQUEST).json({
-                                                    error: 'Failed to add site data in DB!'
-                                                })
-                                            })
+                                        // await create(prisma.siteData, {
+                                        //     ...data,
+                                        //     siteFileLink: `https://${process.env.BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${fileName}`
+                                        // })
+                                        //     .then(value => {
+                                        //         return res.status(SC.OK).json({
+                                        //             message: 'Site data created successfully!',
+                                        //             data: value
+                                        //         })
+                                        //     })
+                                        //     .catch(err => {
+                                        //         logger(err, 'ERROR')
+                                        //         return res.status(SC.BAD_REQUEST).json({
+                                        //             error: 'Failed to add site data in DB!'
+                                        //         })
+                                        //     })
+                                        res.json({ url: `https://${process.env.BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${fileName}` })
                                     } else {
                                         res.status(SC.BAD_REQUEST).json({
                                             error: 'Cannot able to process file!'
