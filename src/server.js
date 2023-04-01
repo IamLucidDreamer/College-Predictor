@@ -24,7 +24,7 @@ const { validationResult } = require('express-validator')
 const { createSiteData } = require('./helpers/fileHelper')
 
 //testing
-app.get('/api', (_, res) => {
+app.get('/college-api', (_, res) => {
 	res.send('Hello from college predictor BE!')
 })
 

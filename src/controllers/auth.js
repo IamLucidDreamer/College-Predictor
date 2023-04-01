@@ -119,7 +119,10 @@ const signin = async (req, res) => {
 			const expiryTime = new Date()
 			expiryTime.setMonth(expiryTime.getMonth() + 6)
 			const exp = parseInt(expiryTime.getTime() / 1000)
-			const token = jwt.sign({ _id: user._id, exp: exp }, process.env.SECRET)
+			const token = jwt.sign(
+				{ _id: user._id, exp: exp },
+				process.env.SECRET || 'college-predictor'
+			)
 			res.cookie('Token', token, { expire: new Date() + 9999 })
 			user.salt = undefined
 			user.__v = undefined

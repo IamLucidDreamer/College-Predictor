@@ -1,32 +1,11 @@
 const { create, updateById, deleteById, getById } = require('../helpers/crud')
-const updatesSchema = require('../models/updates')
+const collegeSchema = require('../models/college')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 
-const createUpdates = async (req, res) => {
+const createCollege = async (req, res) => {
 	try {
-		req.body.userId = req.auth._id
-		await create(req.body, updatesSchema)
-			.then(data => {
-				res.status(SC.OK).json(data)
-			})
-			.catch(err => {
-				res.status(SC.INTERNAL_SERVER_ERROR).json({
-					status: 'Failed!',
-					err
-				})
-			})
-	} catch (err) {
-		logger(err, 'ERROR')
-	} finally {
-		logger('Create Updates Function is Executed')
-	}
-}
-
-const updateUpdates = async (req, res) => {
-	try {
-		const id = req.params.id
-		await updateById(req.body, id, updatesSchema)
+		await create(req.body, collegeSchema)
 			.then(data => {
 				res.status(SC.OK).json(data)
 			})
@@ -39,14 +18,14 @@ const updateUpdates = async (req, res) => {
 	} catch (err) {
 		loggerUtil(err, 'ERROR')
 	} finally {
-		logger('Update Updates Function is Executed')
+		logger('Create College Function is Executed')
 	}
 }
 
-const deleteUpdates = async (req, res) => {
+const updateCollege = async (req, res) => {
 	try {
 		const id = req.params.id
-		await deleteById(id, updatesSchema)
+		await updateById(req.body, id, collegeSchema)
 			.then(data => {
 				res.status(SC.OK).json(data)
 			})
@@ -59,14 +38,34 @@ const deleteUpdates = async (req, res) => {
 	} catch (err) {
 		loggerUtil(err, 'ERROR')
 	} finally {
-		logger('Delete Updates Function is Executed')
+		logger('Update College Function is Executed')
 	}
 }
 
-const getUpdates = async (req, res) => {
+const deleteCollege = async (req, res) => {
+	try {
+		const id = req.params.id
+		await deleteById(id, collegeSchema)
+			.then(data => {
+				res.status(SC.OK).json(data)
+			})
+			.catch(err => {
+				res.status(SC.INTERNAL_SERVER_ERROR).json({
+					status: 'Failed!',
+					err
+				})
+			})
+	} catch (err) {
+		loggerUtil(err, 'ERROR')
+	} finally {
+		logger('Delete College Function is Executed')
+	}
+}
+
+const getCollege = async (req, res) => {
 	const id = req.params.id
 	try {
-		await getById(id, updatesSchema)
+		await getById(id, collegeSchema)
 			.then(data => {
 				res.status(SC.OK).json(data)
 			})
@@ -79,12 +78,12 @@ const getUpdates = async (req, res) => {
 	} catch (err) {
 		loggerUtil(err, 'ERROR')
 	} finally {
-		logger('Get Updates Function is Executed')
+		logger('Get College Function is Executed')
 	}
 }
 const label = {
-	totalDocs: 'totalupdates',
-	docs: 'updates',
+	totalDocs: 'totalColleges',
+	docs: 'College',
 	limit: 'perPage',
 	page: 'currentPage',
 	nextPage: 'nextPageNo',
@@ -92,7 +91,7 @@ const label = {
 	totalPages: 'pageCount'
 }
 
-const getAllUpdates = async (req, res) => {
+const getAllColleges = async (req, res) => {
 	const options = {
 		page: 1,
 		limit: 10,
@@ -102,29 +101,29 @@ const getAllUpdates = async (req, res) => {
 	req.query.limit !== undefined ? (options.limit = req.query.limit) : null
 	const id = req.params.id
 	try {
-		await updatesSchema.paginate({}, options, (err, result) => {
+		await collegeSchema.paginate({}, options, (err, result) => {
 			if (err) {
 				res.status(SC.BAD_REQUEST).json({
-					error: 'Getting updatess from DB is failed!'
+					error: 'Getting Colleges from DB is failed!'
 				})
 				logger(err, 'ERROR')
 			}
 			res.status(SC.OK).send({
-				message: 'updatess fetched successfully',
+				message: 'Colleges fetched successfully',
 				data: result
 			})
 		})
 	} catch (err) {
 		loggerUtil(err, 'ERROR')
 	} finally {
-		logger('Get all Updates Function is Executed')
+		logger('Get all Colleges Function is Executed')
 	}
 }
 
 module.exports = {
-	createUpdates,
-	updateUpdates,
-	deleteUpdates,
-	getUpdates,
-	getAllUpdates
+	createCollege,
+	updateCollege,
+	deleteCollege,
+	getCollege,
+	getAllColleges
 }
