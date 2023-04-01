@@ -5,6 +5,7 @@ const { loggerUtil: logger } = require('../utils/logger')
 
 const createUpdates = async (req, res) => {
 	try {
+		req.body.userId = req.auth._id
 		await create(req.body, updatesSchema)
 			.then(data => {
 				res.status(SC.OK).json(data)
@@ -16,7 +17,7 @@ const createUpdates = async (req, res) => {
 				})
 			})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
 		logger('Create Updates Function is Executed')
 	}

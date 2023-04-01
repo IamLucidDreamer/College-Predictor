@@ -8,13 +8,7 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			maxlength: 32,
 			trim: true,
-			// required: true
-		},
-		lastname: {
-			type: String,
-			maxlength: 32,
-			trim: true,
-			default: null
+			required: true
 		},
 		dateOfBirth: {
 			type: String,
@@ -28,16 +22,30 @@ const userSchema = new mongoose.Schema(
 		},
 		email: {
 			type: String,
+			unique: [true, "Email already registered."],
 			required: true,
 			trim: true
 		},
-		phone: {
+		countryCode: {
+			type: Number,
+			maxlength: 5,
+			default: null,
+			required: true,
+		},
+		phoneNumber: {
 			type: Number,
 			maxlength: 15,
-			default: null
+			unique: [true, "Phone Number already registered."],
+			default: null,
+			required: true,
 		},
 		encrypted_password: {
 			type: String,
+			required: true
+		},
+		examType: {
+			type: Number,
+			enum: [1, 2],
 			required: true
 		},
 		salt: {

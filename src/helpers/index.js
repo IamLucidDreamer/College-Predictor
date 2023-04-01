@@ -1,3 +1,5 @@
+const { loggerUtil } = require("../utils/logger")
+
 const predictionHelper = (req, schema) => {
 	return new Promise(async (accept, reject) => {
 		const body = req.body
@@ -21,15 +23,27 @@ const predictionHelper = (req, schema) => {
 				}
 			])
 			.then(data => {
+				const passedData = data.filter(val => val.closingRank + (val?.closingRank / 10) >= body.rank)
+				const processedData = [...passedData.map(val => {
+					if (val?.closingRank >= body.rank) {
+						val.percentage = 100
+						return val
+					}
+					else {
+						val.percentage = 100 - Math.ceil(((parseInt(body.rank) - val?.closingRank) / (val?.closingRank / 10)) * 100)
+						return val
+					}
+				})
+				]
 				if (body.rank) {
 					accept({
 						status: 'SUCCESS',
-						data: data.filter(val => val.closingRank >= body.rank)
+						data: processedData
 					})
 				} else {
 					accept({
 						status: 'SUCCESS',
-						data
+						data: processedData
 					})
 				}
 			})
@@ -49,12 +63,12 @@ const dropdownValuesHelper = (req, schema) => {
 				...mapObj,
 				...(body[key].length
 					? {
-							...{
-								[key]: {
-									$in: body[key]
-								}
+						...{
+							[key]: {
+								$in: body[key]
 							}
-					  }
+						}
+					}
 					: {})
 			}
 			groupObj = {

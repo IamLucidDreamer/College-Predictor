@@ -5,24 +5,75 @@ const { validationResult: validate } = require('express-validator')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 
+const twilioAccountSID = process.env.TWILIO_ACCOUNT_SID
+const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN
+const twilioServiceSID = process.env.TWILIO_SERVICE_SID
+const twilio = require("twilio")(twilioAccountSID, twilioAuthToken)
+
+const sendOTP = async (req, res) => {
+	const errors = validate(req) || []
+	if (!errors.isEmpty()) {
+		return res.status(SC.WRONG_ENTITY).json({
+			status: SC.WRONG_ENTITY,
+			error: errors.array()[0]?.msg
+		})
+	}
+	const { phoneNumber } = req.body
+	try {
+		twilio.verify.v2.services(twilioServiceSID)
+			.verifications
+			.create({ to: phoneNumber, channel: 'sms' })
+			.then(verification => res.status(SC.OK).json({
+				status: SC.OK,
+				message: `OTP send successfully to ${phoneNumber}`,
+				data: verification
+			})).catch(err => {
+				res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
+					status: err.status,
+					err: { err },
+				})
+			})
+	}
+	catch (err) {
+		logger(err)
+	}
+	finally {
+		logger("OTP API Called")
+	}
+}
+
 const signup = async (req, res) => {
-	const errors = validate(req)
+	const errors = validate(req) || []
 	if (!errors.isEmpty()) {
 		return res.status(SC.WRONG_ENTITY).json({
 			error: errors.array()[0].msg
 		})
 	}
-	const { email } = req.body
+	const { email, phoneNumber } = req.body
 	try {
-		userModel.findOne({ email }).exec((err, user) => {
+		userModel.findOne({
+			$or: [
+				{ email: email },
+				{ phoneNumber: phoneNumber }
+			]
+		}).exec((err, user) => {
 			if (err || user) {
 				return res.status(SC.WRONG_ENTITY).json({
-					error: 'E-Mail already has been registered!',
-					suggestion: 'Try using some other E-mail.'
+					error: 'E-Mail or Phone Number already has been registered!',
+					suggestion: 'Try using some other E-mail or Phone Number.'
 				})
 			} else {
 				const user = new userModel(req.body)
 				user.save((err, user) => {
+
+					const expiryTime = new Date()
+					expiryTime.setMonth(expiryTime.getMonth() + 6)
+					const exp = parseInt(expiryTime.getTime() / 1000)
+					const token = jwt.sign({ _id: user._id, exp: exp }, process.env.SECRET)
+					res.cookie('Token', token, { expire: new Date() + 9999 })
+					user.salt = undefined
+					user.__v = undefined
+
 					if (err) {
 						return res.status(SC.BAD_REQUEST).json({
 							err: err,
@@ -31,7 +82,8 @@ const signup = async (req, res) => {
 					}
 					res.status(SC.OK).json({
 						message: 'User Signed Up, Successfully!',
-						data: user
+						data: user,
+						token : token
 					})
 				})
 			}
@@ -39,7 +91,7 @@ const signup = async (req, res) => {
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
-		logger(`User Signed Up Sucessfully using Email - ${email}`)
+		logger(`User Signed Up Sucessfully using Email - ${email , phoneNumber}`)
 	}
 }
 
@@ -130,6 +182,7 @@ const update = async (req, res) => {
 }
 
 module.exports = {
+	sendOTP,
 	signup,
 	signin,
 	signout,

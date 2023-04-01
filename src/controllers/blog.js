@@ -5,6 +5,7 @@ const { loggerUtil: logger } = require('../utils/logger')
 
 const createBlog = async (req, res) => {
 	try {
+		req.body.userId = req.auth._id
 		await create(req.body, blogSchema)
 			.then(data => {
 				res.status(SC.OK).json(data)
