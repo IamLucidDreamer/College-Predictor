@@ -51,4 +51,4 @@ const collegeSchema = new mongoose.Schema(
 )
 
 collegeSchema.plugin(mongoosePaginate)
-module.exports = mongoose.model('neet', collegeSchema, 'neet')
+module.exports = mongoose.model('college', collegeSchema, 'college')
