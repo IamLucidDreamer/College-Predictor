@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 
 const { validationResult: validate } = require('express-validator')
 const { statusCode: SC } = require('../utils/statusCode')
-const { loggerUtil: logger } = require('../utils/logger')
+const { loggerUtil: logger, loggerUtil } = require('../utils/logger')
 
 const twilioAccountSID = process.env.TWILIO_ACCOUNT_SID
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN
@@ -45,53 +45,80 @@ const sendOTP = async (req, res) => {
 const signup = async (req, res) => {
 	const errors = validate(req) || []
 	if (!errors.isEmpty()) {
-		return res.status(SC.WRONG_ENTITY).json({
-			error: errors.array()[0].msg
+		return res.status(WRONG_ENTITY).json({
+			status: WRONG_ENTITY,
+			error: errors.array()[0]?.msg
 		})
 	}
-	const { email, phoneNumber } = req.body
+	const { email, countryCode, phoneNumber, otp } = req.body
 	try {
-		userModel.findOne({
+		userModel.find({
 			$or: [
 				{ email: email },
 				{ phoneNumber: phoneNumber }
 			]
 		}).exec((err, user) => {
-			if (err || user) {
-				return res.status(SC.WRONG_ENTITY).json({
-					error: 'E-Mail or Phone Number already has been registered!',
-					suggestion: 'Try using some other E-mail or Phone Number.'
-				})
-			} else {
-				const user = new userModel(req.body)
-				user.save((err, user) => {
-					if (err) {
+			if (err) {
+				return res.status(SC.BAD_REQUEST).json({
+					status: SC.BAD_REQUEST,
+					error: "Something Went wrong"
+				});
+			}
+			if (user.length !== 0) {
+				return res.status(SC.BAD_REQUEST).json({
+					status: SC.BAD_REQUEST,
+					error: "Email or Phone Number already registered."
+				});
+			}
+			twilio.verify.v2.services(twilioServiceSID)
+				.verificationChecks
+				.create({ to: `${countryCode}${phoneNumber}`, code: otp })
+				.then(verification_check => {
+					if (verification_check.status === "approved") {
+						loggerUtil("iiiadsfasdfasdfadsfadsf")
+						const user = new userModel(req.body)
+						user.save()
+							.then(user => {
+
+								const expiryTime = new Date()
+								expiryTime.setMonth(expiryTime.getMonth() + 6)
+								const exp = parseInt(expiryTime.getTime() / 1000)
+								const token = jwt.sign(
+									{ _id: user._id, exp: exp },
+									process.env.SECRET || 'college-predictor'
+								)
+								res.cookie('Token', token, { expire: new Date() + 9999 })
+								user.salt = undefined
+								user.__v = undefined
+
+								res.status(SC.OK).json({
+									status: SC.OK,
+									message: "User Registered Successfully.",
+									token,
+									data: user
+								})
+							}
+							)
+							.catch(err => res.status(SC.BAD_REQUEST).json({
+								status: SC.BAD_REQUEST,
+								message: err.message
+							}));
+					}
+					else {
 						return res.status(SC.BAD_REQUEST).json({
-							err: err,
-							error: 'Failed to add user in DB!'
+							status: SC.BAD_REQUEST,
+							error: "Entered OTP is Invalid."
 						})
 					}
-					
-					const expiryTime = new Date()
-					expiryTime.setMonth(expiryTime.getMonth() + 6)
-					const exp = parseInt(expiryTime.getTime() / 1000)
-					const token = jwt.sign({ _id: user._id, exp: exp }, process.env.SECRET)
-					res.cookie('Token', token, { expire: new Date() + 9999 })
-					user.salt = undefined
-					user.__v = undefined
-
-					res.status(SC.OK).json({
-						message: 'User Signed Up, Successfully!',
-						data: user,
-						token : token
-					})
-				})
-			}
+				}).catch(err => res.status(err.status).json({
+					status: err.status,
+					error: { err }
+				}))
 		})
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
-		logger(`User Signed Up Sucessfully using Email - ${email , phoneNumber}`)
+		logger(`Sign up API called by user - ${email} , ${phoneNumber}`)
 	}
 }
 
@@ -104,7 +131,7 @@ const signin = async (req, res) => {
 	}
 	const { email, password } = req.body
 	try {
-		await userModel.findOne({ email }, (err, user) => {
+		await userModel.findOne({ email }).exec((err, user) => {
 			if (err || !user) {
 				return res.status(SC.NOT_FOUND).json({
 					error: "E-Mail doesn't exist in DB!"
