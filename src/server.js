@@ -20,11 +20,12 @@ const auth = require('./routes/auth')
 const user = require('./routes/user')
 const blog = require('./routes/blog')
 const updates = require('./routes/updates')
+const college = require('./routes/college')
 const { validationResult } = require('express-validator')
 const { createSiteData } = require('./helpers/fileHelper')
 
 //testing
-app.get('/college-api', (_, res) => {
+app.get('/api', (_, res) => {
 	res.send('Hello from college predictor BE!')
 })
 
@@ -51,6 +52,7 @@ app.use('/api', auth)
 app.use('/api', user)
 app.use('/api', blog)
 app.use('/api', updates)
+app.use('/api', college)
 
 
 //connection

@@ -129,17 +129,19 @@ const signin = async (req, res) => {
 			error: errors.array()[0].msg
 		})
 	}
-	const { email, password } = req.body
+	const { email, phoneNumber, password } = req.body
+	const body = req.body
+	delete body.password
 	try {
-		await userModel.findOne({ email }).exec((err, user) => {
+		await userModel.findOne({ ...body }).exec((err, user) => {
 			if (err || !user) {
 				return res.status(SC.NOT_FOUND).json({
-					error: "E-Mail doesn't exist in DB!"
+					error: "Phone Number or E-mail doesn't exist in DB!"
 				})
 			}
 			if (!user.authenticate(password)) {
 				return res.status(SC.UNAUTHORIZED).json({
-					error: 'Oops!, E-mail and Password does not match!'
+					error: 'Oops!, Phone Number / E-mail and Password does not match!'
 				})
 			}
 
@@ -162,7 +164,7 @@ const signin = async (req, res) => {
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
-		logger(`User Signed in - ${email}`)
+		logger(`User Signed in - ${email} , ${phoneNumber}`)
 	}
 }
 

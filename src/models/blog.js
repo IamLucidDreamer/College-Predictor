@@ -17,9 +17,12 @@ const blogSchema = new mongoose.Schema(
 			required: true,
 			trim: true
 		},
-		image: {
+		imageMain: {
 			type: String
-		}
+		},
+		imageSecondary: {
+			type: String
+		},
 	},
 	{ timestamps: true }
 )

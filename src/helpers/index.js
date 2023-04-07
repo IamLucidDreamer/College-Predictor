@@ -31,6 +31,7 @@ const predictionHelper = (req, schema) => {
 					}
 					else {
 						val.percentage = 100 - Math.ceil(((parseInt(body.rank) - val?.closingRank) / (val?.closingRank / 10)) * 100)
+						val.percentage 
 						return val
 					}
 				})

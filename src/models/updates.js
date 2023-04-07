@@ -17,7 +17,7 @@ const updatesSchema = new mongoose.Schema(
 			required: true,
 			trim: true
 		},
-		image: {
+		imageMain: {
 			type: String
 		},
 		document: {
