@@ -3,8 +3,8 @@
  */
 const express = require('express')
 const dotenv = require('dotenv')
-const cors = require('cors')
-const helmet = require('helmet')
+// const cors = require('cors')
+// const helmet = require('helmet')
 const mongo = require('./config/mongo')
 const { loggerUtil } = require('./utils/logger')
 
@@ -25,7 +25,7 @@ const { validationResult } = require('express-validator')
 const { createSiteData } = require('./helpers/fileHelper')
 
 //testing
-app.get('/api', (_, res) => {
+app.get('/college-api', (_, res) => {
 	res.send('Hello from college predictor BE!')
 })
 
@@ -42,17 +42,17 @@ app.use((req, res, next) => {
 app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(helmet())
-app.use(cors())
+// app.use(helmet())
+// app.use(cors())
 
-app.post("/api/document" , createSiteData)
+app.post("/college-api/document" , createSiteData)
 
-app.use('/api', route)
-app.use('/api', auth)
-app.use('/api', user)
-app.use('/api', blog)
-app.use('/api', updates)
-app.use('/api', college)
+app.use('/college-api', route)
+app.use('/college-api', auth)
+app.use('/college-api', user)
+app.use('/college-api', blog)
+app.use('/college-api', updates)
+app.use('/college-api', college)
 
 
 //connection
