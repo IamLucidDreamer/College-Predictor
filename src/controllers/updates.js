@@ -2,20 +2,30 @@ const { create, updateById, deleteById, getById } = require('../helpers/crud')
 const updatesSchema = require('../models/updates')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
+const formidable = require('formidable')
+const { createSiteData } = require('../helpers/fileHelper')
 
 const createUpdates = async (req, res) => {
 	try {
-		req.body.userId = req.auth._id
-		await create(req.body, updatesSchema)
-			.then(data => {
-				res.status(SC.OK).json(data)
-			})
-			.catch(err => {
-				res.status(SC.INTERNAL_SERVER_ERROR).json({
-					status: 'Failed!',
-					err
+		const form = new formidable.IncomingForm()
+		form.parse(req, async (err, fields, file) => {
+			const formValue = JSON.parse(fields.data)
+			formValue.imageMain = await createSiteData(file.imageMain, res, err)
+			if (file.document) {
+				formValue.document = await createSiteData(file.document, res, err,)
+			}
+			formValue.userId = req.auth._id
+			await create(formValue, updatesSchema)
+				.then(data => {
+					res.status(SC.OK).json(data)
 				})
-			})
+				.catch(err => {
+					res.status(SC.INTERNAL_SERVER_ERROR).json({
+						status: 'Failed!',
+						err
+					})
+				})
+		})
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
@@ -25,17 +35,27 @@ const createUpdates = async (req, res) => {
 
 const updateUpdates = async (req, res) => {
 	try {
-		const id = req.params.id
-		await updateById(req.body, id, updatesSchema)
-			.then(data => {
-				res.status(SC.OK).json(data)
-			})
-			.catch(err => {
-				res.status(SC.INTERNAL_SERVER_ERROR).json({
-					status: 'Failed!',
-					err
+		const form = new formidable.IncomingForm()
+		form.parse(req, async (err, fields, file) => {
+			const formValue = JSON.parse(fields.data)
+			if (file.imageMain) {
+				formValue.imageMain = await createSiteData(file.imageMain, res, err)
+			}
+			if (file.document) {
+				formValue.document = await createSiteData(file.document, res, err,)
+			} formValue.userId = req.auth._id
+			const id = req.params.id
+			await updateById(req.body, id, updatesSchema)
+				.then(data => {
+					res.status(SC.OK).json(data)
 				})
-			})
+				.catch(err => {
+					res.status(SC.INTERNAL_SERVER_ERROR).json({
+						status: 'Failed!',
+						err
+					})
+				})
+		})
 	} catch (err) {
 		loggerUtil(err, 'ERROR')
 	} finally {
