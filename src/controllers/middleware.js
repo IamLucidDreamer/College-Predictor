@@ -31,7 +31,7 @@ const isAdmin = async (req, res, next) => {
 		await userModel.findById(authId).exec((err, user) => {
 			if (err || !user) {
 				return res.status(SC.NOT_FOUND).json({
-					error: 'No user was found in DB!'
+					error: 'No user was found in DB or token expired!'
 				})
 			}
 			if (user.role === 2) {

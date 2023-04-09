@@ -44,7 +44,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(helmet())
 app.use(cors())
 
-
 app.post("/api/document" , createSiteData)
 
 app.use('/api', route)
