@@ -3,8 +3,8 @@
  */
 const express = require('express')
 const dotenv = require('dotenv')
-// const cors = require('cors')
-// const helmet = require('helmet')
+const cors = require('cors')
+const helmet = require('helmet')
 const mongo = require('./config/mongo')
 const { loggerUtil } = require('./utils/logger')
 
@@ -21,6 +21,7 @@ const user = require('./routes/user')
 const blog = require('./routes/blog')
 const updates = require('./routes/updates')
 const college = require('./routes/college')
+const subscriber = require('./routes/subscriber')
 const { validationResult } = require('express-validator')
 const { createSiteData } = require('./helpers/fileHelper')
 
@@ -42,10 +43,10 @@ app.use((req, res, next) => {
 app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-// app.use(helmet())
-// app.use(cors())
+app.use(helmet())
+app.use(cors())
 
-app.post("/college-api/document" , createSiteData)
+app.post("/college-api/document", createSiteData)
 
 app.use('/college-api', route)
 app.use('/college-api', auth)
@@ -53,6 +54,7 @@ app.use('/college-api', user)
 app.use('/college-api', blog)
 app.use('/college-api', updates)
 app.use('/college-api', college)
+app.use('/college-api', subscriber)
 
 
 //connection
