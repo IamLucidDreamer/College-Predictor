@@ -1,9 +1,11 @@
 const { create, updateById, deleteById, getById } = require('../helpers/crud')
 const collegeSchema = require('../models/college')
+const neet = require('../models/neet')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 const formidable = require('formidable')
 const { createSiteData } = require('../helpers/fileHelper')
+
 
 const createCollege = async (req, res) => {
 	try {
@@ -22,8 +24,18 @@ const createCollege = async (req, res) => {
 			}))
 			formValue.userId = req.auth._id
 			await create(formValue, collegeSchema)
-				.then(data => {
-					res.status(SC.OK).json(data)
+				.then(async data => {
+					await neet.updateMany({ instituteName: formValue.collegeName }, {
+						collegeId: data.data._id
+					}).then((college) => {
+						res.status(SC.OK).json({ data: data, college: college })
+					}
+					).catch(err => {
+						res.status(SC.INTERNAL_SERVER_ERROR).json({
+							status: 'Failed!',
+							err
+						})
+					})
 				})
 				.catch(err => {
 					res.status(SC.INTERNAL_SERVER_ERROR).json({

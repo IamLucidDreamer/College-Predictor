@@ -36,6 +36,10 @@ const neetSchema = new mongoose.Schema(
 		},
 		closingRank: {
 			type: Number
+		},
+		collegeId: {
+			type: mongoose.Schema.ObjectId,
+			default: null
 		}
 	},
 	{ timestamps: true }
