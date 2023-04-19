@@ -1,35 +1,39 @@
 const express = require('express')
-const { mainData } = require("../controllers/statistics")
 const {
 	getJosaDropdownValues,
 	predictJosa,
 	josaBulkUpload,
-	neetBulkUpload,
-	predictNeet,
-	getNeetDropdownValues
 } = require('../controllers')
-const { isAdmin, isSignedIn, isValidToken } = require('../controllers/middleware')
 const { check } = require('express-validator')
 const router = express.Router()
 
-/**
- * Statistics
- */
-router.get('/statistics/main', isSignedIn, isValidToken, isAdmin, mainData)
+const auth = require('./auth')
+const user = require('./user')
+const blog = require('./blog')
+const updates = require('./updates')
+const college = require('./college')
+const subscriber = require('./subscriber')
+const statistics = require("./statistics")
+const neet = require("./neet")
 
+
+function routesV1(app) {
+	app.use('/api/v1', auth)
+	app.use('/api/v1', user)
+	app.use('/api/v1', blog)
+	app.use('/api/v1', updates)
+	app.use('/api/v1', college)
+	app.use('/api/v1', subscriber)
+	app.use('/api/v1', statistics)
+	app.use('/api/v1', neet)
+}
+
+
+module.exports = { routesV1 }
 
 /**
  * JOSA goes here
- */
-router.post('/bulk-upload/josa', josaBulkUpload)
-router.post('/predict-josa', predictJosa)
-router.post('/josa-dropdown', getJosaDropdownValues)
-
-/**
- * NEET goes here
- */
-router.post('/bulk-upload/neet', neetBulkUpload)
-router.post('/predict-neet', predictNeet)
-router.post('/neet-dropdown', getNeetDropdownValues)
-
-module.exports = router
+//  */
+// router.post('/bulk-upload/josa', josaBulkUpload)
+// router.post('/predict-josa', predictJosa)
+// router.post('/josa-dropdown', getJosaDropdownValues)

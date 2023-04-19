@@ -1,33 +1,28 @@
 /**
- * @author krish
+ * @author krish , Manas
  */
+
 const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const helmet = require('helmet')
 const mongo = require('./config/mongo')
-const { loggerUtil } = require('./utils/logger')
+const { loggerUtil: logger } = require('./utils/logger')
+const { statsCode: SC } = require("./utils/statusCode")
 
 dotenv.config()
 const app = express()
-const logger = loggerUtil
 
 //mongo connection func call
 mongo()
 
-const route = require('./routes/index')
-const auth = require('./routes/auth')
-const user = require('./routes/user')
-const blog = require('./routes/blog')
-const updates = require('./routes/updates')
-const college = require('./routes/college')
-const subscriber = require('./routes/subscriber')
+const { routesV1 } = require('./routes/index')
+
 const { validationResult } = require('express-validator')
-const { createSiteData } = require('./helpers/fileHelper')
 
 //testing
-app.get('/college-api', (_, res) => {
-	res.send('Hello from college predictor BE!')
+app.get('/api/v1/test', (_, res) => {
+	res.status(SC.OK).send("Hello from college predictor BE! Version 1 API's are working.")
 })
 
 //validate req
@@ -46,20 +41,12 @@ app.use(express.urlencoded({ extended: true }))
 app.use(helmet())
 app.use(cors())
 
-app.post("/college-api/document", createSiteData)
-
-app.use('/college-api', route)
-app.use('/college-api', auth)
-app.use('/college-api', user)
-app.use('/college-api', blog)
-app.use('/college-api', updates)
-app.use('/college-api', college)
-app.use('/college-api', subscriber)
-
+// Routes 
+routesV1(app)
 
 //connection
-const PORT = 8004
+const PORT = process.env.PORT || 8004
 
 app.listen(PORT, () => {
-	logger(`Listening on port------ ${PORT}`, 'SERVER')
+	logger(`Listening on port--------- ${PORT}`, 'SERVER')
 })
