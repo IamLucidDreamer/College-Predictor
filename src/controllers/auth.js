@@ -75,7 +75,6 @@ const signup = async (req, res) => {
 				.create({ to: `${countryCode}${phoneNumber}`, code: otp })
 				.then(verification_check => {
 					if (verification_check.status === "approved") {
-						loggerUtil("iiiadsfasdfasdfadsfadsf")
 						const user = new userModel(req.body)
 						user.save()
 							.then(user => {
