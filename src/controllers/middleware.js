@@ -34,7 +34,87 @@ const isAdmin = async (req, res, next) => {
 					error: 'No user was found in DB or token expired!'
 				})
 			}
+			if (user.role === 3) {
+				next()
+			} else {
+				res.status(SC.UNAUTHORIZED).json({
+					error: 'Not an admin!'
+				})
+			}
+		})
+	}
+}
+
+const isCounsellor = async (req, res, next) => {
+	const authId = req.auth._id
+	if (authId) {
+		await userModel.findById(authId).exec((err, user) => {
+			if (err || !user) {
+				return res.status(SC.NOT_FOUND).json({
+					error: 'No user was found in DB or token expired!'
+				})
+			}
 			if (user.role === 2) {
+				next()
+			} else {
+				res.status(SC.UNAUTHORIZED).json({
+					error: 'Not an admin!'
+				})
+			}
+		})
+	}
+}
+
+const isCollegeAdmin = async (req, res, next) => {
+	const authId = req.auth._id
+	if (authId) {
+		await userModel.findById(authId).exec((err, user) => {
+			if (err || !user) {
+				return res.status(SC.NOT_FOUND).json({
+					error: 'No user was found in DB or token expired!'
+				})
+			}
+			if (user.role === 4) {
+				next()
+			} else {
+				res.status(SC.UNAUTHORIZED).json({
+					error: 'Not an admin!'
+				})
+			}
+		})
+	}
+}
+
+const isCounsellorOrAdmin = async (req, res, next) => {
+	const authId = req.auth._id
+	if (authId) {
+		await userModel.findById(authId).exec((err, user) => {
+			if (err || !user) {
+				return res.status(SC.NOT_FOUND).json({
+					error: 'No user was found in DB or token expired!'
+				})
+			}
+			if (user.role === 2 || user.role === 3) {
+				next()
+			} else {
+				res.status(SC.UNAUTHORIZED).json({
+					error: 'Not an admin!'
+				})
+			}
+		})
+	}
+}
+
+const isAdminOrCounsellorOrCollegeAdmin = async (req, res, next) => {
+	const authId = req.auth._id
+	if (authId) {
+		await userModel.findById(authId).exec((err, user) => {
+			if (err || !user) {
+				return res.status(SC.NOT_FOUND).json({
+					error: 'No user was found in DB or token expired!'
+				})
+			}
+			if (user.role === 2 || user.role === 3 || user.role === 4) {
 				next()
 			} else {
 				res.status(SC.UNAUTHORIZED).json({
@@ -49,5 +129,9 @@ module.exports = {
 	isSignedIn,
 	isValidToken,
 	isAuthenticated,
-	isAdmin
+	isAdmin,
+	isCounsellor,
+	isCollegeAdmin,
+	isCounsellorOrAdmin,
+	isAdminOrCounsellorOrCollegeAdmin
 }
