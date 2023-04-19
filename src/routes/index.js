@@ -1,12 +1,11 @@
-const express = require('express')
-const {
-	getJosaDropdownValues,
-	predictJosa,
-	josaBulkUpload,
-} = require('../controllers')
-const { check } = require('express-validator')
-const router = express.Router()
+// const express = require('express')
+// const {
+// 	getJosaDropdownValues,
+// 	predictJosa,
+// 	josaBulkUpload,
+// } = require('../controllers')
 
+const test = require("./test")
 const auth = require('./auth')
 const user = require('./user')
 const blog = require('./blog')
@@ -18,6 +17,7 @@ const neet = require("./neet")
 
 
 function routesV1(app) {
+	app.use('/api/v1', test)
 	app.use('/api/v1', auth)
 	app.use('/api/v1', user)
 	app.use('/api/v1', blog)
