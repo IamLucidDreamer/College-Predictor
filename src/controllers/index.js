@@ -6,6 +6,7 @@ const readXlsxFile = require('read-excel-file/node')
 const { loggerUtil: logger } = require('../utils/logger')
 const { statusCode: SC } = require('../utils/statusCode')
 const { predictionHelper, dropdownValuesHelper } = require('../helpers')
+const { default: mongoose } = require('mongoose')
 
 /**
  * JOSA goes here

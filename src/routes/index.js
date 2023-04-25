@@ -1,4 +1,5 @@
 const express = require('express')
+const { mainData } = require("../controllers/statistics")
 const {
 	getJosaDropdownValues,
 	predictJosa,
@@ -7,7 +8,15 @@ const {
 	predictNeet,
 	getNeetDropdownValues
 } = require('../controllers')
+const { isAdmin, isSignedIn, isValidToken } = require('../controllers/middleware')
+const { check } = require('express-validator')
 const router = express.Router()
+
+/**
+ * Statistics
+ */
+router.get('/statistics/main', isSignedIn, isValidToken, isAdmin, mainData)
+
 
 /**
  * JOSA goes here
