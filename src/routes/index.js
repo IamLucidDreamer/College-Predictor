@@ -14,6 +14,7 @@ const college = require('./college')
 const subscriber = require('./subscriber')
 const statistics = require("./statistics")
 const neet = require("./neet")
+const userFollowUp = require("./userFollowUp")
 
 
 function routesV1(app) {
@@ -26,8 +27,8 @@ function routesV1(app) {
 	app.use('/api/v1', subscriber)
 	app.use('/api/v1', statistics)
 	app.use('/api/v1', neet)
+	app.use('/api/v1', userFollowUp)
 }
-
 
 module.exports = { routesV1 }
 

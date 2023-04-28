@@ -22,7 +22,7 @@ const { validationResult } = require('express-validator')
 
 //testing
 app.get('/api/v1/test', (_, res) => {
-	res.status(SC.OK).send("Hello from college predictor BE! Version 1 API's are working.")
+	res.status(SC.OK).send("<h1>Hello world</h1>")
 })
 
 //validate req
