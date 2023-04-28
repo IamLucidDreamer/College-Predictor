@@ -55,7 +55,7 @@ const updateBlog = async (req, res) => {
 				})
 		})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
 		logger('Update Blog Function is Executed')
 	}
@@ -75,7 +75,7 @@ const deleteBlog = async (req, res) => {
 				})
 			})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
 		logger('Delete Blog Function is Executed')
 	}
@@ -95,7 +95,7 @@ const getBlog = async (req, res) => {
 				})
 			})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
 		logger('Get Blog Function is Executed')
 	}
@@ -133,7 +133,7 @@ const getAllBlogs = async (req, res) => {
 			})
 		})
 	} catch (err) {
-		loggerUtil(err, 'ERROR')
+		logger(err, 'ERROR')
 	} finally {
 		logger('Get all Blogs Function is Executed')
 	}

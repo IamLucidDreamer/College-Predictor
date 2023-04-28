@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const mongoosePaginate = require('mongoose-paginate-v2')
 
 const neetSchema = new mongoose.Schema(
 	{
@@ -31,6 +32,15 @@ const neetSchema = new mongoose.Schema(
 			required: true,
 			trim: true
 		},
+		year: {
+			type: Number,
+			required: true
+		},
+		examCategory: {
+			type: String,
+			required: true,
+			trim: true
+		},
 		openingRank: {
 			type: Number
 		},
@@ -44,5 +54,7 @@ const neetSchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 )
+
+neetSchema.plugin(mongoosePaginate)
 
 module.exports = mongoose.model('neet', neetSchema, 'neet')
