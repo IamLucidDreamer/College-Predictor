@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema(
 			trim: true,
 			required: true
 		},
+		profileImage: {
+			type: String,
+			trim: true,
+		},
 		dateOfBirth: {
 			type: String,
 			trim: true,
@@ -48,12 +52,31 @@ const userSchema = new mongoose.Schema(
 			enum: [1, 2],
 			required: true
 		},
+		city: {
+			type: String,
+		},
+		state: {
+			type: String,
+		},
+		tenthMarks: {
+			type: String,
+		},
+		twelthMarks: {
+			type: String
+		},
+		address: {
+			type: String
+		},
 		salt: {
 			type: String
 		},
 		role: {
 			type: Number,
 			default: 1
+		},
+		reviewerId: {
+			type: mongoose.Schema.ObjectId,
+			default: null
 		}
 	},
 	{ timestamps: true }

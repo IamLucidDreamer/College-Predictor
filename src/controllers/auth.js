@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken')
 const { validationResult: validate } = require('express-validator')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger, loggerUtil } = require('../utils/logger')
+const formidable = require('formidable')
+const { createSiteData } = require('../helpers/fileHelper.js')
 
 const twilioAccountSID = process.env.TWILIO_ACCOUNT_SID
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN
@@ -174,33 +176,109 @@ const signout = (_, res) => {
 	})
 }
 
-const update = async (req, res) => {
-	const id = req.auth._id
+const forgotPassword = async (req, res) => {
 	try {
-		await userModel.findOne({ _id: id }).exec((err, data) => {
-			if (err || !data) {
-				return res.status(SC.NOT_FOUND).json({
-					error: 'User Not Found!'
+		const errors = validate(req) || []
+		if (!errors.isEmpty()) {
+			return res.status(SC.WRONG_ENTITY).json({
+				status: SC.WRONG_ENTITY,
+				error: errors.array()[0]?.msg
+			})
+		}
+		const { newPassword, countryCode, phoneNumber, otp } = req.body
+		try {
+			userModel.findOne({ phoneNumber: phoneNumber }).then(userWithPhone => {
+				if (userWithPhone) {
+					twilio.verify.v2.services(twilioServiceSID)
+						.verificationChecks
+						.create({ to: `+${countryCode}${phoneNumber}`, code: otp })
+						.then(verification_check => {
+							if (verification_check.status === "approved") {
+								userWithPhone.password = newPassword
+								userWithPhone.save()
+									.then(updatedUser => {
+										res.status(SC.OK).json({
+											status: SC.OK,
+											message: "Password Successfully Updated.",
+											data: updatedUser
+										})
+									})
+									.catch(err => res.status(SC.BAD_REQUEST).json({
+										status: SC.BAD_REQUEST,
+										message: err.message
+									}));
+							}
+							else {
+								return res.status(SC.BAD_REQUEST).json({
+									status: SC.BAD_REQUEST,
+									error: "Entered OTP is Invalid."
+								})
+							}
+						}).catch(err => res.status(err.status).json({
+							status: err.status,
+							error: { err }
+						}))
+				}
+				else {
+					return res.status(SC.NOT_FOUND).json({
+						status: SC.NOT_FOUND,
+						error: "User Not Fount."
+					});
+				}
+			}).catch()
+		} catch (err) {
+			res.status(SC.BAD_REQUEST).json({
+				status: SC.BAD_REQUEST,
+				error: "Something went Wrong."
+			})
+		}
+	} catch (err) {
+		loggerUtil(err, 'ERROR')
+	} finally {
+		loggerUtil(`Forgot Password API Called.`)
+	}
+}
+
+const update = async (req, res) => {
+	try {
+		const id = req.auth._id
+		const form = new formidable.IncomingForm()
+		form.parse(req, async (err, fields, file) => {
+			const formValue = JSON.parse(fields.data)
+			if (file.profileImage) {
+				formValue.profileImage = await createSiteData(file.profileImage, res, err)
+			} const { email, password } = formValue
+			if (email || password) {
+				return res.status(SC.BAD_REQUEST).json({
+					error: 'Cannot update email or password'
 				})
 			}
-			userModel
-				.updateOne(
-					{ _id: id },
-					{
-						$set: req.body
-					}
-				)
-				.then(() => {
-					res.status(SC.OK).json({
-						message: 'User Updated Successfully!'
+			await userModel.findOne({ _id: id }).exec((err, data) => {
+				if (err || !data) {
+					return res.status(SC.NOT_FOUND).json({
+						error: 'User Not Found!'
 					})
-				})
-				.catch(err => {
-					res.status(SC.INTERNAL_SERVER_ERROR).json({
-						error: 'User Updation Failed!'
+				}
+				userModel
+					.findByIdAndUpdate(
+						{ _id: id },
+						{
+							$set: formValue
+						}, { new: true }
+					)
+					.then((user) => {
+						res.status(SC.OK).json({
+							message: 'User Updated Successfully!',
+							data: user
+						})
 					})
-					logger(err, 'ERROR')
-				})
+					.catch(err => {
+						res.status(SC.INTERNAL_SERVER_ERROR).json({
+							error: 'User Updation Failed!'
+						})
+						logger(err, 'ERROR')
+					})
+			})
 		})
 	} catch (err) {
 		logger(err, 'ERROR')
@@ -214,5 +292,6 @@ module.exports = {
 	signup,
 	signin,
 	signout,
+	forgotPassword,
 	update
 }

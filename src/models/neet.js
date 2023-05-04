@@ -5,40 +5,40 @@ const neetSchema = new mongoose.Schema(
 	{
 		course: {
 			type: String,
-			required: true,
+			default: null,
 			trim: true
 		},
 		round: {
 			type: Number,
-			required: true
+			default: null,
 		},
 		allottedPH: {
 			type: String,
-			required: true,
+			default: null,
 			trim: true
 		},
 		quota: {
 			type: String,
-			required: true,
+			default: null,
 			trim: true
 		},
 		allottedCategory: {
 			type: String,
-			required: true,
+			default: null,
 			trim: true
 		},
 		instituteName: {
 			type: String,
-			required: true,
+			default: null,
 			trim: true
 		},
 		year: {
 			type: Number,
-			required: true
+			default: null,
 		},
 		examCategory: {
 			type: String,
-			required: true,
+			default: null,
 			trim: true
 		},
 		openingRank: {
@@ -46,6 +46,10 @@ const neetSchema = new mongoose.Schema(
 		},
 		closingRank: {
 			type: Number
+		},
+		examType: {
+			type: String,
+			required: true
 		},
 		collegeId: {
 			type: mongoose.Schema.ObjectId,

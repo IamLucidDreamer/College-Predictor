@@ -116,6 +116,7 @@ const getAllUpdates = async (req, res) => {
 	const options = {
 		page: 1,
 		limit: 10,
+		sort: { createdAt: -1 },
 		customLabels: label
 	}
 	req.query.page !== undefined ? (options.page = req.query.page) : null

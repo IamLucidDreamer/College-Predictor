@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const { check } = require('express-validator')
-const { sendOTP, signup, signin, signout, update } = require('../controllers/auth')
+const { check, body } = require('express-validator')
+const { sendOTP, signup, signin, signout, forgotPassword, update } = require('../controllers/auth')
 const { isSignedIn, isValidToken } = require('../controllers/middleware')
 
 router.post(
@@ -38,6 +38,27 @@ router.post(
 	],
 	signin
 )
+
+router.post('/forgot-password',
+	[
+		check('newPassword')
+			.isLength({ min: 8 })
+			.withMessage('New Password length should be minimum of 8 characters'),
+		check('phoneNumber')
+			.isMobilePhone()
+			.withMessage('Please provide a valid Phone Number!'),
+		check('otp')
+			.isLength({ min: 4 })
+			.withMessage('OTP Length should be 4 digits')
+	],
+	body('confirmPassword').custom((value, { req }) => {
+		if (value !== req.body.newPassword) {
+			throw new Error('Confirmation Password does not match password');
+		}
+		// Indicates the success of this synchronous custom validator
+		return true;
+	}),
+	forgotPassword)
 
 router.put(
 	'/user/update',

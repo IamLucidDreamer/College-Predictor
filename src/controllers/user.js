@@ -22,10 +22,14 @@ const getUserById = async (req, res) => {
 	}
 }
 
-const getAllUsers = async (_, res) => {
+const getAllUsers = async (req, res) => {
 	try {
-		await userModel
-			.find({})
+		const id = req.auth._id
+		const getAll = req.query.getAll
+		console.log(getAll , "sdf")
+		const filter = getAll == 1 ? {} : { reviewerId: id }
+		userModel
+			.find(filter)
 			.sort({ createdAt: -1 })
 			.exec((err, user) => {
 				if (err || !user) {
