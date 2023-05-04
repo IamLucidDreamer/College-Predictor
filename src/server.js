@@ -8,7 +8,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const mongo = require('./config/mongo')
 const { loggerUtil: logger } = require('./utils/logger')
-const { statsCode: SC } = require("./utils/statusCode")
+const { statusCode: SC } = require("./utils/statusCode")
 
 dotenv.config()
 const app = express()
@@ -22,7 +22,7 @@ const { validationResult } = require('express-validator')
 
 //testing
 app.get('/api/v1/test', (_, res) => {
-	res.status(SC.OK).send("<h1>Hello world</h1>")
+	res.status(SC.OK).send("<h1>Hello from College Predictor BE.</h1>")
 })
 
 //validate req

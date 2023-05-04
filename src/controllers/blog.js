@@ -114,11 +114,11 @@ const getAllBlogs = async (req, res) => {
 	const options = {
 		page: 1,
 		limit: 10,
-		customLabels: label
+		customLabels: label,
+		sort: { createdAt: -1 }
 	}
 	req.query.page !== undefined ? (options.page = req.query.page) : null
 	req.query.limit !== undefined ? (options.limit = req.query.limit) : null
-	const id = req.params.id
 	try {
 		await blogSchema.paginate({}, options, (err, result) => {
 			if (err) {

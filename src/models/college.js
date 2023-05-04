@@ -17,6 +17,11 @@ const collegeSchema = new mongoose.Schema(
 			required: true,
 			trim: true
 		},
+		displayName: {
+			type: String,
+			required: true,
+			trim: true
+		},
 		collegeType: {
 			type: String,
 			trim: true

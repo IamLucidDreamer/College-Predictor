@@ -1,5 +1,6 @@
 const { create, updateById, deleteById, getById } = require('../helpers/crud')
 const userFollowUpSchema = require('../models/userFollowUp')
+const userModel = require("../models/user")
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 
@@ -23,45 +24,48 @@ const createFollowUp = async (req, res) => {
     }
 }
 
-const deleteBlog = async (req, res) => {
+const updateUserCounsellor = async (req, res) => {
     try {
-        const id = req.params.id
-        await deleteById(id, blogSchema)
-            .then(data => {
-                res.status(SC.OK).json(data)
-            })
-            .catch(err => {
-                res.status(SC.INTERNAL_SERVER_ERROR).json({
-                    status: 'Failed!',
-                    err
+        const userId = req.params.userId
+        const id = req.auth._id
+        await userModel.findOne({ _id: userId }).exec((err, data) => {
+            if (err || !data) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'User Not Found!'
                 })
-            })
+            }
+            if (data.reviewerId) {
+                return res.status(SC.BAD_REQUEST).json({
+                    error: 'Lead has already been assigned!',
+                })
+            }
+            userModel
+                .findByIdAndUpdate(
+                    { _id: userId },
+                    {
+                        $set: { reviewerId: id }
+                    }, { new: true }
+                )
+                .then((user) => {
+                    res.status(SC.OK).json({
+                        message: 'User Updated Successfully!',
+                        data: user
+                    })
+                })
+                .catch(err => {
+                    res.status(SC.INTERNAL_SERVER_ERROR).json({
+                        error: 'User Updation Failed!'
+                    })
+                    logger(err, 'ERROR')
+                })
+        })
     } catch (err) {
-        loggerUtil(err, 'ERROR')
+        logger(err, 'ERROR')
     } finally {
-        logger('Delete Blog Function is Executed')
+        logger('User Update Function is Executed')
     }
 }
 
-const getBlog = async (req, res) => {
-    const id = req.params.id
-    try {
-        await getById(id, blogSchema)
-            .then(data => {
-                res.status(SC.OK).json(data)
-            })
-            .catch(err => {
-                res.status(SC.INTERNAL_SERVER_ERROR).json({
-                    status: 'Failed!',
-                    err
-                })
-            })
-    } catch (err) {
-        loggerUtil(err, 'ERROR')
-    } finally {
-        logger('Get Blog Function is Executed')
-    }
-}
 const label = {
     totalDocs: 'totalFollowUps',
     docs: 'followUps',
@@ -102,7 +106,9 @@ const getAllFollowUpsOfAUser = async (req, res) => {
     }
 }
 
+
 module.exports = {
     createFollowUp,
-    getAllFollowUpsOfAUser
+    getAllFollowUpsOfAUser,
+    updateUserCounsellor
 }

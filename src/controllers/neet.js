@@ -35,8 +35,9 @@ const neetBulkUpload = async (req, res) => {
                                 instituteName: val?.[5],
                                 examCategory: val?.[6],
                                 year: val?.[7],
-                                openingRank: typeof val?.[8] === 'number' ? val?.[6] : null,
-                                closingRank: typeof val?.[9] === 'number' ? val?.[7] : null
+                                openingRank: typeof val?.[8] === 'number' ? val?.[8] : null,
+                                closingRank: typeof val?.[9] === 'number' ? val?.[9] : null,
+                                examType: fields.examType
                             }))
 
                         neetSchema.insertMany(arr).then(data => {
