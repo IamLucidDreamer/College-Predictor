@@ -18,6 +18,9 @@ const userFollowUp = require("./userFollowUp")
 
 
 function routesV1(app) {
+	app.get('/api/v1/update',
+		(_, res) => { return res.status(200).json({ version: 4, updateUrl: "https://docs.google.com/document/d/1LuqB7mtLzjD5lpymq-Qsyr0DSp2gbNMu5jYLgK0NNqo/edit" }) }
+	)
 	app.use('/api/v1', test)
 	app.use('/api/v1', auth)
 	app.use('/api/v1', user)
