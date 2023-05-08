@@ -32,6 +32,11 @@ const neetSchema = new mongoose.Schema(
 			default: null,
 			trim: true
 		},
+		instituteType: {
+			type: String,
+			default: null,
+			trim: true
+		},
 		year: {
 			type: Number,
 			default: null,
