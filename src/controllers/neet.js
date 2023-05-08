@@ -33,10 +33,11 @@ const neetBulkUpload = async (req, res) => {
                                 quota: val?.[3],
                                 allottedCategory: val?.[4],
                                 instituteName: val?.[5],
-                                examCategory: val?.[6],
-                                year: val?.[7],
-                                openingRank: typeof val?.[8] === 'number' ? val?.[8] : null,
-                                closingRank: typeof val?.[9] === 'number' ? val?.[9] : null,
+                                instituteType: val?.[6],
+                                examCategory: val?.[7],
+                                year: val?.[8],
+                                openingRank: typeof val?.[9] === 'number' ? val?.[9] : null,
+                                closingRank: typeof val?.[10] === 'number' ? val?.[10] : null,
                                 examType: fields.examType
                             }))
 

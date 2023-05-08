@@ -73,6 +73,10 @@ const collegeSchema = new mongoose.Schema(
 			type: String,
 			trim: true
 		},
+		applicationLink: {
+			type: String,
+			trim: true
+		},
 		hotnessScore: {
 			type: Number
 		},
