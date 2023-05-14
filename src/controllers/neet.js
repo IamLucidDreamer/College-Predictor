@@ -23,31 +23,35 @@ const neetBulkUpload = async (req, res) => {
                         error: 'File size is too big!'
                     })
                 } else {
-                    readXlsxFile(fs.createReadStream(file.file.filepath)).then(rows => {
-                        const arr = rows
-                            ?.filter((_, inx) => inx > 0)
-                            ?.map(val => ({
-                                course: val?.[0],
-                                round: val?.[1],
-                                allottedPH: val?.[2],
-                                quota: val?.[3],
-                                allottedCategory: val?.[4],
-                                instituteName: val?.[5],
-                                instituteType: val?.[6],
-                                examCategory: val?.[7],
-                                year: val?.[8],
-                                openingRank: typeof val?.[9] === 'number' ? val?.[9] : null,
-                                closingRank: typeof val?.[10] === 'number' ? val?.[10] : null,
-                                examType: fields.examType
-                            }))
-
-                        neetSchema.insertMany(arr).then(data => {
-                            res.status(SC.OK).json({
-                                status: 'SUCCESS',
-                                data
+                    try {
+                        readXlsxFile(fs.createReadStream(file.file.filepath)).then(rows => {
+                            const arr = rows
+                                ?.filter((_, inx) => inx > 0)
+                                ?.map(val => ({
+                                    course: val?.[0],
+                                    round: val?.[1],
+                                    allottedPH: val?.[2],
+                                    quota: val?.[3],
+                                    allottedCategory: val?.[4],
+                                    instituteName: val?.[5],
+                                    instituteType: val?.[6],
+                                    examCategory: val?.[7],
+                                    year: val?.[8],
+                                    openingRank: typeof val?.[9] === 'number' ? val?.[9] : null,
+                                    closingRank: typeof val?.[10] === 'number' ? val?.[10] : null,
+                                    examType: fields.examType
+                                }))
+                            neetSchema.insertMany(arr).then(data => {
+                                res.status(SC.OK).json({
+                                    status: 'SUCCESS',
+                                    data
+                                })
                             })
                         })
-                    })
+                    }
+                    catch (err) {
+                        return res.status(400).json({ err: err, message: "Problem with the file" })
+                    }
                 }
             }
         })
@@ -77,6 +81,30 @@ const predictNeet = async (req, res) => {
     }
 }
 
+const deleteNeetValues = async (req, res) => {
+    try {
+        const examType = req.body.examType
+        const year = req.body.year
+        console.log(req.body, "body");
+        console.log(examType, "exam");
+        console.log(year, "year");
+        await neetSchema.deleteMany({ examType, year }).then(data => {
+            res.status(SC.OK).json({ data: data, message: "Records Deleted Successfully" })
+        })
+            .catch(err => {
+                res.status(SC.INTERNAL_SERVER_ERROR).json({
+                    status: 'Failed!',
+                    err
+                })
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Delete Neet Data Function is Executed')
+    }
+}
+
+
 const getNeetDropdownValues = async (req, res) => {
     try {
         await dropdownValuesHelper(req, neetSchema)
@@ -95,6 +123,7 @@ const getNeetDropdownValues = async (req, res) => {
         logger('Get NEET Drop Down Values function is executed!')
     }
 }
+
 
 const label = {
     totalDocs: 'totalNeetRecords',
@@ -140,5 +169,6 @@ module.exports = {
     neetBulkUpload,
     getAllNeetData,
     predictNeet,
+    deleteNeetValues,
     getNeetDropdownValues
 }
