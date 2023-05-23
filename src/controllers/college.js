@@ -209,6 +209,39 @@ const getTopStateColleges = async (req, res) => {
 	}
 }
 
+
+const getCollegeBySearch = async (req, res) => {
+	const options = {
+		page: 1,
+		limit: 10,
+		customLabels: label,
+		sort: { hotnessScore: -1 },
+	}
+	req.query.page !== undefined ? (options.page = req.query.page) : null
+	req.query.limit !== undefined ? (options.limit = req.query.limit) : null
+	try {
+		await collegeSchema.paginate({
+			$or: [{ collegeName: { $regex: req.body.name, $options: 'i' } },
+			{ displayName: { $regex: req.body.name, $options: 'i' } }]
+		}, options, (err, result) => {
+			if (err) {
+				res.status(SC.BAD_REQUEST).json({
+					error: 'Getting Colleges from DB is failed!'
+				})
+				logger(err, 'ERROR')
+			}
+			res.status(SC.OK).send({
+				message: 'Colleges fetched successfully',
+				data: result
+			})
+		})
+	} catch (err) {
+		logger(err, 'ERROR')
+	} finally {
+		logger('Search Colleges Function is Executed')
+	}
+}
+
 module.exports = {
 	createCollege,
 	updateCollege,
@@ -216,5 +249,6 @@ module.exports = {
 	getCollege,
 	getAllColleges,
 	getTopColleges,
-	getTopStateColleges
+	getTopStateColleges,
+	getCollegeBySearch
 }

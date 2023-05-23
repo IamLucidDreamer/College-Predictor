@@ -6,7 +6,8 @@ const {
 	getCollege,
 	getAllColleges,
 	getTopColleges,
-	getTopStateColleges
+	getTopStateColleges,
+	getCollegeBySearch
 } = require('../controllers/college')
 const { isSignedIn, isValidToken, isAdminOrCounsellorOrCollegeAdmin } = require('../controllers/middleware')
 const router = express.Router()
@@ -18,5 +19,6 @@ router.get('/college/get/:id', getCollege)
 router.get('/college/get-all', getAllColleges)
 router.get('/college/get-all-top', getTopColleges)
 router.post('/college/get-all-top-state', getTopStateColleges)
+router.post('/college/search', getCollegeBySearch)
 
 module.exports = router
