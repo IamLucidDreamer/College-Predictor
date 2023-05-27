@@ -11,16 +11,12 @@ const createSiteData = async (file, res, err) => {
     try {
         if (err) {
             logger(err, 'ERROR')
-            res.status(SC.BAD_REQUEST).json({
-                error: 'Problem occurred with file!'
-            })
+            return
         }
         if (file) {
 
             if (file.size > 5000000) {
-                res.status(SC.BAD_REQUEST).json({
-                    error: 'File size should be less than 5 MB'
-                })
+                return
             } else {
                 const fileName = file.originalFilename
                 const client = new S3Client({
@@ -52,17 +48,13 @@ const createSiteData = async (file, res, err) => {
                                     imageUrl = `https://${process.env.BUCKET_NAME}.s3.ap-south-1.amazonaws.com/${fileName}`
                                     return
                                 } else {
-                                    res.status(SC.BAD_REQUEST).json({
-                                        error: 'Cannot able to process file!'
-                                    })
+                                    return
                                 }
                             })
                     })
             }
         } else {
-            res.status(SC.NOT_FOUND).json({
-                error: 'File not found!'
-            })
+            return
         }
     } catch (err) {
         logger(err, 'ERROR')
