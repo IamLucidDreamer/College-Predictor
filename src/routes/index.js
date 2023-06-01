@@ -14,6 +14,7 @@ const college = require('./college')
 const subscriber = require('./subscriber')
 const statistics = require("./statistics")
 const neet = require("./neet")
+const ayush = require("./ayush")
 const userFollowUp = require("./userFollowUp")
 
 
@@ -30,6 +31,7 @@ function routesV1(app) {
 	app.use('/api/v1', subscriber)
 	app.use('/api/v1', statistics)
 	app.use('/api/v1', neet)
+	app.use('/api/v1', ayush)
 	app.use('/api/v1', userFollowUp)
 }
 
