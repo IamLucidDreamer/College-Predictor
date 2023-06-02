@@ -206,14 +206,14 @@ const forgotPassword = async (req, res) => {
 											process.env.SECRET || 'college-predictor'
 										)
 										res.cookie('Token', token, { expire: new Date() + 9999 })
-										user.salt = undefined
-										user.__v = undefined
+										updatedUser.salt = undefined
+										updatedUser.__v = undefined
 
 										res.status(SC.OK).json({
 											status: SC.OK,
 											message: "Password Successfully Updated.",
 											data: updatedUser,
-											token
+											token: token
 										})
 									})
 									.catch(err => res.status(SC.BAD_REQUEST).json({
