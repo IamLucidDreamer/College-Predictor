@@ -212,7 +212,7 @@ const forgotPassword = async (req, res) => {
 										res.status(SC.OK).json({
 											status: SC.OK,
 											message: "Password Successfully Updated.",
-											data: updatedUser,
+											data: newUserData,
 											token
 										})
 									})
