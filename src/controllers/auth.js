@@ -197,10 +197,23 @@ const forgotPassword = async (req, res) => {
 								userWithPhone.password = newPassword
 								userWithPhone.save()
 									.then(updatedUser => {
+
+										const expiryTime = new Date()
+										expiryTime.setMonth(expiryTime.getMonth() + 6)
+										const exp = parseInt(expiryTime.getTime() / 1000)
+										const token = jwt.sign(
+											{ _id: updatedUser._id, exp: exp },
+											process.env.SECRET || 'college-predictor'
+										)
+										res.cookie('Token', token, { expire: new Date() + 9999 })
+										user.salt = undefined
+										user.__v = undefined
+
 										res.status(SC.OK).json({
 											status: SC.OK,
 											message: "Password Successfully Updated.",
-											data: updatedUser
+											data: updatedUser,
+											token
 										})
 									})
 									.catch(err => res.status(SC.BAD_REQUEST).json({
