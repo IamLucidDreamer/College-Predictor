@@ -196,18 +196,18 @@ const forgotPassword = async (req, res) => {
 							if (verification_check.status === "approved") {
 								userWithPhone.password = newPassword
 								userWithPhone.save()
-									.then(updatedUser => {
+									.then(newUserData => {
 
 										const expiryTime = new Date()
 										expiryTime.setMonth(expiryTime.getMonth() + 6)
 										const exp = parseInt(expiryTime.getTime() / 1000)
 										const token = jwt.sign(
-											{ _id: updatedUser._id, exp: exp },
+											{ _id: newUserData._id, exp: exp },
 											process.env.SECRET || 'college-predictor'
 										)
 										res.cookie('Token', token, { expire: new Date() + 9999 })
-										user.salt = undefined
-										user.__v = undefined
+										newUserData.salt = undefined
+										newUserData.__v = undefined
 
 										res.status(SC.OK).json({
 											status: SC.OK,
