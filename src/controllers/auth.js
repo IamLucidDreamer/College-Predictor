@@ -119,7 +119,7 @@ const signup = async (req, res) => {
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
-		logger(`Sign up API called by user - ${email} , ${phoneNumber}, ${req.body}`)
+		logger(`Sign up API called by user - ${email} , ${phoneNumber}, ${req?.body?.password}`)
 	}
 }
 
