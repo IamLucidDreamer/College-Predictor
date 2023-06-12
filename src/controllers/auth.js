@@ -54,7 +54,6 @@ const signup = async (req, res) => {
 	}
 	const { email, countryCode, phoneNumber, otp } = req.body
 	try {
-		logger("Req Body", req.body)
 		userModel.find({
 			$or: [
 				{ email: email },
@@ -120,7 +119,7 @@ const signup = async (req, res) => {
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
-		logger(`Sign up API called by user - ${email} , ${phoneNumber}`)
+		logger(`Sign up API called by user - ${email} , ${phoneNumber}, ${req.body}`)
 	}
 }
 
