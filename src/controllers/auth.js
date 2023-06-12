@@ -54,6 +54,7 @@ const signup = async (req, res) => {
 	}
 	const { email, countryCode, phoneNumber, otp } = req.body
 	try {
+		logger("Req Body", req.body)
 		userModel.find({
 			$or: [
 				{ email: email },
