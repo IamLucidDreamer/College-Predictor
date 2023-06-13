@@ -119,7 +119,7 @@ const signup = async (req, res) => {
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
-		logger(`Sign up API called by user - ${email} , ${phoneNumber}`)
+		logger(`Sign up API called by user - ${email} , ${phoneNumber}, ${req?.body?.password}`)
 	}
 }
 
@@ -206,9 +206,6 @@ const forgotPassword = async (req, res) => {
 											process.env.SECRET || 'college-predictor'
 										)
 										res.cookie('Token', token, { expire: new Date() + 9999 })
-
-
-
 										newUserData.salt = undefined
 										newUserData.__v = undefined
 
@@ -216,7 +213,7 @@ const forgotPassword = async (req, res) => {
 											status: SC.OK,
 											message: "Password Successfully Updated.",
 											data: newUserData,
-											token: token
+											token
 										})
 									})
 									.catch(err => res.status(SC.BAD_REQUEST).json({
