@@ -20,7 +20,7 @@ const userFollowUp = require("./userFollowUp")
 
 function routesV1(app) {
 	app.get('/api/v1/update',
-		(_, res) => { return res.status(200).json({ version: 6, updateUrl: "https://play.google.com/store/apps/details?id=in.careerkick" }) }
+		(_, res) => { return res.status(200).json({ version: 5, updateUrl: "https://play.google.com/store/apps/details?id=in.careerkick" }) }
 	)
 	app.use('/api/v1', test)
 	app.use('/api/v1', auth)
