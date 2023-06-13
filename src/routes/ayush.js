@@ -14,7 +14,7 @@ router.post('/ayush/bulk-upload', isSignedIn, isValidToken, isAdmin, ayushBulkUp
 router.get('/ayush/get-all', isSignedIn, isValidToken, isAdmin, getAllAyushData)
 router.post('/ayush/delete', isSignedIn, isValidToken, isAdmin, deleteAyushValues)
 router.post('/predict-ayush', predictAyush)
-router.post('/ayush-dropdown', getAllAyushData)
+router.post('/ayush-dropdown', getAyushDropdownValues)
 
 
 module.exports = router
