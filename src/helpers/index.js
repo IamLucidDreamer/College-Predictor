@@ -106,7 +106,12 @@ const dropdownValuesHelper = (req, schema) => {
 	})
 }
 
+const generateOtp = () => {
+	return Math.floor(100000 + Math.random() * 900000)
+}
+
 module.exports = {
 	predictionHelper,
-	dropdownValuesHelper
+	dropdownValuesHelper,
+	generateOtp
 }
