@@ -37,49 +37,49 @@ const sendOTP = async (req, res) => {
 	}
 	const { phoneNumber } = req.body
 	try {
-		// twilio.verify.v2.services(twilioServiceSID)
-		// 	.verifications
-		// 	.create({ to: phoneNumber, channel: 'sms' })
-		// 	.then(verification => res.status(SC.OK).json({
-		// 		status: SC.OK,
-		// 		message: `OTP send successfully to ${phoneNumber}`,
-		// 		data: verification
-		// 	})).catch(err => {
-		// 		res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
-		// 			status: err.status,
-		// 			err: { err },
-		// 		})
-		// 	})
-		const params = {
-			Protocol: 'sms',
-			TopicArn: "arn:aws:sns:ap-south-1:282026163748:Careerkick",
-			Endpoint: phoneNumber
-		};
+		twilio.verify.v2.services(twilioServiceSID)
+			.verifications
+			.create({ to: phoneNumber, channel: 'sms' })
+			.then(verification => res.status(SC.OK).json({
+				status: SC.OK,
+				message: `OTP send successfully to ${phoneNumber}`,
+				data: verification
+			})).catch(err => {
+				res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
+					status: err.status,
+					err: { err },
+				})
+			})
+		// const params = {
+		// 	Protocol: 'sms',
+		// 	TopicArn: "arn:aws:sns:ap-south-1:282026163748:Careerkick",
+		// 	Endpoint: phoneNumber
+		// };
 
-		sns.subscribe(params, (err, data) => {
-			if (err) {
-				console.error('Error subscribing user to topic:', err);
-			} else {
-				console.log('User subscribed to topic:', data.SubscriptionArn);
-				// Send the OTP message to the user
-				sendOTPMessage(phoneNumber, otpCode); // Implement the sendOTPMessage function
-			}
-		});
-		function sendOTPMessage(phoneNumber, otpCode) {
-			const params = {
-				Message: `Your OTP code is: ${otpCode}`,
-				PhoneNumber: phoneNumber
-			};
+		// sns.subscribe(params, (err, data) => {
+		// 	if (err) {
+		// 		console.error('Error subscribing user to topic:', err);
+		// 	} else {
+		// 		console.log('User subscribed to topic:', data.SubscriptionArn);
+		// 		// Send the OTP message to the user
+		// 		sendOTPMessage(phoneNumber, otpCode); // Implement the sendOTPMessage function
+		// 	}
+		// });
+		// function sendOTPMessage(phoneNumber, otpCode) {
+		// 	const params = {
+		// 		Message: `Your OTP code is: ${otpCode}`,
+		// 		PhoneNumber: phoneNumber
+		// 	};
 
-			sns.publish(params, (err, data) => {
-				if (err) {
-					console.error('Error sending OTP message:', err);
-				} else {
-					console.log('OTP message sent:', data.MessageId);
-					return res.status(200).json({ data: data })
-				}
-			});
-		}
+		// 	sns.publish(params, (err, data) => {
+		// 		if (err) {
+		// 			console.error('Error sending OTP message:', err);
+		// 		} else {
+		// 			console.log('OTP message sent:', data.MessageId);
+		// 			return res.status(200).json({ data: data })
+		// 		}
+		// 	});
+		// }
 		// const params = {
 		// 	Message: `Your OTP code is for Careerkick is ${otpCode}. Do not share this with anyone.`,
 		// 	TopicArn: 'arn:aws:sns:ap-south-1:282026163748:Careerkick',
