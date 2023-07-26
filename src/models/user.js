@@ -64,6 +64,9 @@ const userSchema = new mongoose.Schema(
 		twelthMarks: {
 			type: String
 		},
+		medicalMarks: {
+			type: String
+		},
 		address: {
 			type: String
 		},
