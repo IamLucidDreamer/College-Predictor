@@ -67,6 +67,9 @@ const userSchema = new mongoose.Schema(
 		medicalMarks: {
 			type: String
 		},
+		expoPushToken: {
+			type: String
+		},
 		address: {
 			type: String
 		},

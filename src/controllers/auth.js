@@ -1,113 +1,51 @@
 const userModel = require('../models/user.js')
 const jwt = require('jsonwebtoken')
-const dotenv = require('dotenv')
 const { validationResult: validate } = require('express-validator')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger, loggerUtil } = require('../utils/logger')
 const formidable = require('formidable')
+// const admin = require('firebase-admin');
 const { createSiteData } = require('../helpers/fileHelper.js')
-
-const AWS = require('aws-sdk');
 const { generateOtp } = require('../helpers/index.js')
 
-dotenv.config()
 
-AWS.config.update({
-	accessKeyId: process.env.ACCESS_KEY,
-	secretAccessKey: process.env.ACCESS_SECRET,
-	region: 'ap-south-1'
-});
+// Initialize Firebase Admin SDK
+// const serviceAccount = require('../config/test-careerkick-otp-firebase-adminsdk-s8ncv-392336a3ab.json');
+// admin.initializeApp({
+// 	credential: admin.credential.cert(serviceAccount),
+// });
 
-const twilioAccountSID = process.env.TWILIO_ACCOUNT_SID
-const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN
-const twilioServiceSID = process.env.TWILIO_SERVICE_SID
-const twilio = require("twilio")(twilioAccountSID, twilioAuthToken)
+// const otpCode = generateOtp() // Replace with your OTP code generation logic
 
-const sns = new AWS.SNS();
-
-const otpCode = generateOtp() // Replace with your OTP code generation logic
 
 const sendOTP = async (req, res) => {
-	const errors = validate(req) || []
-	if (!errors.isEmpty()) {
-		return res.status(SC.WRONG_ENTITY).json({
-			status: SC.WRONG_ENTITY,
-			error: errors.array()[0]?.msg
-		})
-	}
-	const { phoneNumber } = req.body
-	try {
-		twilio.verify.v2.services(twilioServiceSID)
-			.verifications
-			.create({ to: phoneNumber, channel: 'sms' })
-			.then(verification => res.status(SC.OK).json({
-				status: SC.OK,
-				message: `OTP send successfully to ${phoneNumber}`,
-				data: verification
-			})).catch(err => {
-				res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
-					status: err.status,
-					err: { err },
-				})
-			})
-		// const params = {
-		// 	Protocol: 'sms',
-		// 	TopicArn: "arn:aws:sns:ap-south-1:282026163748:Careerkick",
-		// 	Endpoint: phoneNumber
-		// };
-
-		// sns.subscribe(params, (err, data) => {
-		// 	if (err) {
-		// 		console.error('Error subscribing user to topic:', err);
-		// 	} else {
-		// 		console.log('User subscribed to topic:', data.SubscriptionArn);
-		// 		// Send the OTP message to the user
-		// 		sendOTPMessage(phoneNumber, otpCode); // Implement the sendOTPMessage function
-		// 	}
-		// });
-		// function sendOTPMessage(phoneNumber, otpCode) {
-		// 	const params = {
-		// 		Message: `Your OTP code is: ${otpCode}`,
-		// 		PhoneNumber: phoneNumber
-		// 	};
-
-		// 	sns.publish(params, (err, data) => {
-		// 		if (err) {
-		// 			console.error('Error sending OTP message:', err);
-		// 		} else {
-		// 			console.log('OTP message sent:', data.MessageId);
-		// 			return res.status(200).json({ data: data })
-		// 		}
-		// 	});
-		// }
-		// const params = {
-		// 	Message: `Your OTP code is for Careerkick is ${otpCode}. Do not share this with anyone.`,
-		// 	TopicArn: 'arn:aws:sns:ap-south-1:282026163748:Careerkick',
-		// 	PhoneNumber: phoneNumber
-		// };
-		// sns.publish(params, (err, data) => {
-		// 	if (err) {
-		// 		console.error('Error sending OTP message:', err);
-		// 		res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
-		// 			status: err.status,
-		// 			err: { err },
-		// 		})
-		// 	} else {
-		// 		console.log('OTP message sent:', data.MessageId);
-		// 		res.status(SC.OK).json({
-		// 			status: SC.OK,
-		// 			message: `OTP send successfully to ${phoneNumber}`,
-		// 			data: data
-		// 		})
-		// 	}
-		// });
-	}
-	catch (err) {
-		logger(err)
-	}
-	finally {
-		logger("OTP API Called")
-	}
+	// const errors = validate(req) || []
+	// if (!errors.isEmpty()) {
+	// 	return res.status(SC.WRONG_ENTITY).json({
+	// 		status: SC.WRONG_ENTITY,
+	// 		error: errors.array()[0]?.msg
+	// 	})
+	// }
+	// const { phoneNumber } = req.body
+	// try {
+	// 	admin.auth().setCustomUserClaims(phoneNumber, { otpCode })
+	// 		.then(verification => res.status(SC.OK).json({
+	// 			status: SC.OK,
+	// 			message: `OTP send successfully to ${phoneNumber}`,
+	// 			data: verification
+	// 		})).catch(err => {
+	// 			res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
+	// 				status: err.status,
+	// 				err: { err },
+	// 			})
+	// 		})
+	// }
+	// catch (err) {
+	// 	logger(err)
+	// }
+	// finally {
+	// 	logger("OTP API Called")
+	// }
 }
 
 const signup = async (req, res) => {
@@ -415,11 +353,49 @@ const update = async (req, res) => {
 	}
 }
 
+const saveExpoToken = async (req, res) => {
+	try {
+		const id = req.auth._id
+		const { expoToken } = req.body
+		await userModel.findOne({ _id: id }).exec((err, data) => {
+			if (err || !data) {
+				return res.status(SC.NOT_FOUND).json({
+					error: 'User Not Found!'
+				})
+			}
+			userModel
+				.findByIdAndUpdate(
+					{ _id: id },
+					{
+						$set: { expoPushToken: expoToken }
+					}, { new: true }
+				)
+				.then((user) => {
+					res.status(SC.OK).json({
+						message: 'User Updated Successfully!',
+						data: user
+					})
+				})
+				.catch(err => {
+					res.status(SC.INTERNAL_SERVER_ERROR).json({
+						error: 'User Updation Failed!'
+					})
+					logger(err, 'ERROR')
+				})
+		})
+	} catch (err) {
+		logger(err, 'ERROR')
+	} finally {
+		logger('User Update Function is Executed')
+	}
+}
+
 module.exports = {
 	sendOTP,
 	signup,
 	signin,
 	signout,
 	forgotPassword,
-	update
+	update,
+	saveExpoToken
 }

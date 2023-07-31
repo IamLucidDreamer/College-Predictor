@@ -85,9 +85,6 @@ const deleteNeetValues = async (req, res) => {
     try {
         const examType = req.body.examType
         const year = req.body.year
-        console.log(req.body, "body");
-        console.log(examType, "exam");
-        console.log(year, "year");
         await neetSchema.deleteMany({ examType, year }).then(data => {
             res.status(SC.OK).json({ data: data, message: "Records Deleted Successfully" })
         })

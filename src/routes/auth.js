@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { check, body } = require('express-validator')
-const { sendOTP, signup, signin, signout, forgotPassword, update } = require('../controllers/auth')
+const { sendOTP, signup, signin, signout, forgotPassword, update, saveExpoToken } = require('../controllers/auth')
 const { isSignedIn, isValidToken } = require('../controllers/middleware')
 
 router.post(
@@ -66,6 +66,14 @@ router.put(
 	isSignedIn,
 	isValidToken,
 	update
+)
+
+router.put(
+	'/user/update/expo-token',
+	[check('id').isUUID().withMessage('Please Provide id')],
+	isSignedIn,
+	isValidToken,
+	saveExpoToken
 )
 
 router.get('/signout', signout)

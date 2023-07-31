@@ -18,6 +18,7 @@ const createUpdates = async (req, res) => {
 			await create(formValue, updatesSchema)
 				.then(data => {
 					res.status(SC.OK).json(data)
+					
 				})
 				.catch(err => {
 					res.status(SC.INTERNAL_SERVER_ERROR).json({
