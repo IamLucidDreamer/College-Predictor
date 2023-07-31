@@ -17,8 +17,8 @@ const mainData = async (req, res) => {
         }
         responseObj.userCount = await userModel.count({ role: 1 })
         responseObj.collegeCount = await collegeModel.count({})
-        responseObj.councelorCount = await userModel.count({ role: 2 })
-        responseObj.councelorCount = await userModel.count({ role: 4 })
+        responseObj.councelorCount = await userModel.count({ role: 2 }) // Role 2 for Counsellor 
+        responseObj.collegeAdminCount = await userModel.count({ role: 4 }) // Role 4 for College Admin
         responseObj.totalUpdatesCount = await updatesModel.count({})
         responseObj.totalBlogsCount = await blogModel.count({})
         res.status(SC.OK).json({
