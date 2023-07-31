@@ -386,7 +386,7 @@ const saveExpoToken = async (req, res) => {
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {
-		logger('User Update Function is Executed')
+		logger('User expo token Update Function is Executed')
 	}
 }
 
