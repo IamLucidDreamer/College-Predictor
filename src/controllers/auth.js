@@ -17,35 +17,40 @@ const { generateOtp } = require('../helpers/index.js')
 
 // const otpCode = generateOtp() // Replace with your OTP code generation logic
 
-
+const twilioAccountSID = process.env.TWILIO_ACCOUNT_SID
+const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN
+const twilioServiceSID = process.env.TWILIO_SERVICE_SID
+const twilio = require("twilio")(twilioAccountSID, twilioAuthToken)
 const sendOTP = async (req, res) => {
-	// const errors = validate(req) || []
-	// if (!errors.isEmpty()) {
-	// 	return res.status(SC.WRONG_ENTITY).json({
-	// 		status: SC.WRONG_ENTITY,
-	// 		error: errors.array()[0]?.msg
-	// 	})
-	// }
-	// const { phoneNumber } = req.body
-	// try {
-	// 	admin.auth().setCustomUserClaims(phoneNumber, { otpCode })
-	// 		.then(verification => res.status(SC.OK).json({
-	// 			status: SC.OK,
-	// 			message: `OTP send successfully to ${phoneNumber}`,
-	// 			data: verification
-	// 		})).catch(err => {
-	// 			res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
-	// 				status: err.status,
-	// 				err: { err },
-	// 			})
-	// 		})
-	// }
-	// catch (err) {
-	// 	logger(err)
-	// }
-	// finally {
-	// 	logger("OTP API Called")
-	// }
+	const errors = validate(req) || []
+	if (!errors.isEmpty()) {
+		return res.status(SC.WRONG_ENTITY).json({
+			status: SC.WRONG_ENTITY,
+			error: errors.array()[0]?.msg
+		})
+	}
+	const { phoneNumber } = req.body
+	try {
+		twilio.verify.v2.services(twilioServiceSID)
+			.verifications
+			.create({ to: phoneNumber, channel: 'sms' })
+			.then(verification => res.status(SC.OK).json({
+				status: SC.OK,
+				message: `OTP send successfully to ${phoneNumber}`,
+				data: verification
+			})).catch(err => {
+				res.status(err.status || SC.INTERNAL_SERVER_ERROR).json({
+					status: err.status,
+					err: { err },
+				})
+			})
+	}
+	catch (err) {
+		logger(err)
+	}
+	finally {
+		logger("OTP API Called")
+	}
 }
 
 const signup = async (req, res) => {
