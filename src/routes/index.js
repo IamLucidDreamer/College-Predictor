@@ -16,11 +16,12 @@ const statistics = require("./statistics")
 const neet = require("./neet")
 const ayush = require("./ayush")
 const userFollowUp = require("./userFollowUp")
+const notification = require("./")
 
 
 function routesV1(app) {
 	app.get('/api/v1/update',
-		(_, res) => { return res.status(200).json({ version: 6, updateUrl: "https://play.google.com/store/apps/details?id=in.careerkick" }) }
+		(_, res) => { return res.status(200).json({ version: 7, updateUrl: "https://play.google.com/store/apps/details?id=in.careerkick" }) }
 	)
 	app.use('/api/v1', test)
 	app.use('/api/v1', auth)
@@ -33,6 +34,7 @@ function routesV1(app) {
 	app.use('/api/v1', neet)
 	app.use('/api/v1', ayush)
 	app.use('/api/v1', userFollowUp)
+	app.use('/api/v1', sendNotification)
 }
 
 module.exports = { routesV1 }
