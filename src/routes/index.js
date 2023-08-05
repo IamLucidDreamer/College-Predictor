@@ -16,7 +16,7 @@ const statistics = require("./statistics")
 const neet = require("./neet")
 const ayush = require("./ayush")
 const userFollowUp = require("./userFollowUp")
-// const notification = require("./")
+const notifications = require("./notification")
 
 
 function routesV1(app) {
@@ -34,7 +34,7 @@ function routesV1(app) {
 	app.use('/api/v1', neet)
 	app.use('/api/v1', ayush)
 	app.use('/api/v1', userFollowUp)
-	// app.use('/api/v1', sendNotification)
+	app.use('/api/v1', notifications)
 }
 
 module.exports = { routesV1 }

@@ -6,7 +6,6 @@ const { loggerUtil: logger, loggerUtil } = require('../utils/logger')
 const formidable = require('formidable')
 // const admin = require('firebase-admin');
 const { createSiteData } = require('../helpers/fileHelper.js')
-const { generateOtp } = require('../helpers/index.js')
 
 
 // Initialize Firebase Admin SDK
@@ -358,43 +357,6 @@ const update = async (req, res) => {
 	}
 }
 
-const saveExpoToken = async (req, res) => {
-	try {
-		const id = req.auth._id
-		const { expoToken } = req.body
-		await userModel.findOne({ _id: id }).exec((err, data) => {
-			if (err || !data) {
-				return res.status(SC.NOT_FOUND).json({
-					error: 'User Not Found!'
-				})
-			}
-			userModel
-				.findByIdAndUpdate(
-					{ _id: id },
-					{
-						$set: { expoPushToken: expoToken }
-					}, { new: true }
-				)
-				.then((user) => {
-					res.status(SC.OK).json({
-						message: 'User Updated Successfully!',
-						data: user
-					})
-				})
-				.catch(err => {
-					res.status(SC.INTERNAL_SERVER_ERROR).json({
-						error: 'User Updation Failed!'
-					})
-					logger(err, 'ERROR')
-				})
-		})
-	} catch (err) {
-		logger(err, 'ERROR')
-	} finally {
-		logger('User expo token Update Function is Executed')
-	}
-}
-
 module.exports = {
 	sendOTP,
 	signup,
@@ -402,5 +364,4 @@ module.exports = {
 	signout,
 	forgotPassword,
 	update,
-	saveExpoToken
 }
