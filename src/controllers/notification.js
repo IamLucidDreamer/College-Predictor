@@ -1,13 +1,14 @@
-const { create } = require('../helpers/crud.js')
+const { updateById } = require('../helpers/crud.js')
 const { sendPushNotification } = require('../helpers/pushNotification.js')
-const expoPushTokenSchema = require('../models/expoPushToken.js')
+const userSchema = require("../models/user.js")
 const { loggerUtil: logger } = require('../utils/logger.js')
 const { statusCode: SC } = require('../utils/statusCode')
 
 const saveExpoToken = async (req, res) => {
     try {
-        req.body.expoPushToken = req.body.expoToken
-        await create(req.body, expoPushTokenSchema)
+        await userSchema.findOneAndUpdate(req.auth._id,
+            { "$push": { "expoPushToken": req.body.expoToken } },
+            { new: true })
             .then(data => {
                 res.status(SC.OK).json(data)
             })

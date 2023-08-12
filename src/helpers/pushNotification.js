@@ -1,12 +1,12 @@
 const { Expo } = require('expo-server-sdk');
-const expoPushToken = require('../models/expoPushToken');
+const useSchema = require('../models/user');
 
 const expo = new Expo();
 
 const sendPushNotification = async (title, description, route) => {
     const notificaionToken = [];
 
-    expoPushToken
+    useSchema
         .find({})
         .sort({ createdAt: -1 })
         .exec((err, token) => {
@@ -15,7 +15,7 @@ const sendPushNotification = async (title, description, route) => {
                     error: 'No users were found in a DB!'
                 })
             }
-            token.forEach(({ expoPushToken }) => { notificaionToken.push(expoPushToken) })
+            token.forEach(({ useSchema }) => { notificaionToken.push(useSchema) })
             console.log(notificaionToken);
         })
 

@@ -7,6 +7,8 @@ const router = express.Router()
 
 router.put(
     '/user/update/expo-token',
+    isSignedIn,
+    isValidToken,
     saveExpoToken
 )
 
