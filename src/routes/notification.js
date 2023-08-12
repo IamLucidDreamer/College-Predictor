@@ -2,7 +2,7 @@ const express = require('express')
 const {
     saveExpoToken, sendPushNotifications
 } = require('../controllers/notification')
-const { isSignedIn, isValidToken, isAdminOrCounsellorOrCollegeAdmin } = require('../controllers/middleware')
+const { isSignedIn, isValidToken, isAdminOrCounsellorOrCollegeAdmin, isAdmin } = require('../controllers/middleware')
 const router = express.Router()
 
 router.put(
@@ -14,6 +14,9 @@ router.put(
 
 router.post(
     '/notification/expo-notifcation',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
     sendPushNotifications
 )
 

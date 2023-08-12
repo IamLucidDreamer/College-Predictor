@@ -27,7 +27,10 @@ const saveExpoToken = async (req, res) => {
 
 const sendPushNotifications = async (req, res) => {
     try {
-        sendPushNotification(req.body.title, req.body.description, req.body.route = {})
+        const data = await sendPushNotification(req.body.title, req.body.description, req.body.route = {})
+        res.status(SC.OK).json({
+            message: "Notifications sent successfully"
+        })
     } catch (err) {
         logger(err, 'ERROR')
     } finally {
