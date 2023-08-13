@@ -6,7 +6,7 @@ const { statusCode: SC } = require('../utils/statusCode')
 
 const saveExpoToken = async (req, res) => {
     try {
-        await userSchema.findOneAndUpdate(req.auth._id,
+        await userSchema.findOneAndUpdate({ _id: req.auth._id },
             { "$push": { "expoPushToken": req.body.expoToken } },
             { new: true })
             .then(data => {
