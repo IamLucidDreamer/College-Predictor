@@ -33,6 +33,40 @@ const mainData = async (req, res) => {
     }
 }
 
+const callsStats = async (req, res) => {
+    try {
+        const counsellors = await userModel.aggregate([
+            {
+              $group: {
+                _id: '$reviewerId',
+                totalReviewedUsers: { $sum: 1 }
+              }
+            },
+            {
+              $lookup: {
+                from: 'users', // The collection name you're joining with (assuming it's also "users")
+                localField: '_id',
+                foreignField: '_id',
+                as: 'reviewer'
+              }
+            },
+            {
+              $unwind: '$reviewer'
+            }
+          ])
+        res.status(SC.OK).json({
+            status: SC.OK,
+            data: counsellors
+        })
+    }
+    catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get Call Stats is Executed!')
+    }
+}
+
 module.exports = {
-    mainData
+    mainData,
+    callsStats
 }
