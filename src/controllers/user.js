@@ -26,8 +26,8 @@ const getAllUsers = async (req, res) => {
 	try {
 		const id = req.auth._id
 		const getAll = req.query.getAll
-		console.log(getAll , "sdf")
-		const filter = getAll == 1 ? {} : { reviewerId: id }
+		const isAdmin =req.query.isAdmin
+		const filter = isAdmin == true ? {} : getAll == 1 ? {reviewerId: null}: { reviewerId: id }
 		userModel
 			.find(filter)
 			.sort({ createdAt: -1 })
