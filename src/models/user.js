@@ -86,7 +86,17 @@ const userSchema = new mongoose.Schema(
 		reviewerId: {
 			type: mongoose.Schema.ObjectId,
 			default: null
-		}
+		},
+		referredBy : {
+			type: String,
+			default: null
+		},
+		referralCode: {
+			type: String, default: function () {
+				const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+				return randomCode;
+			}
+		},
 	},
 	{ timestamps: true }
 )

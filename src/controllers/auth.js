@@ -97,12 +97,47 @@ const signup = async (req, res) => {
 						user.salt = undefined
 						user.__v = undefined
 
-						res.status(SC.OK).json({
-							status: SC.OK,
-							message: "User Registered Successfully.",
-							token,
-							data: user
-						})
+						if (req.body.ref_code) {
+							userModel.findOne({ referralCode: req.body.ref_code }).then(parentUser => {
+								if (!parentUser) {
+									return res.status(SC.OK).json({
+										status: SC.OK,
+										message: "User Registered Successfully.",
+										token,
+										data: user,
+										referral: "Invalid"
+									})
+								}
+								userModel.findByIdAndUpdate({ _id: user._id },
+									{
+										$set: { referredBy: req.body.ref_code }
+									}, { new: true }).then(newUser => {
+										return res.status(SC.OK).json({
+											status: SC.OK,
+											message: "User Registered Successfully.",
+											token,
+											data: newUser,
+											referral: "Valid"
+										})
+									}).catch(err => res.status(SC.BAD_REQUEST).json({
+										status: SC.BAD_REQUEST,
+										message: err.message
+									}));
+							}).catch(err => {
+								return res.status(SC.BAD_REQUEST).json({
+									status: SC.BAD_REQUEST,
+									message: err.message
+								})
+							});
+						}
+						else {
+							return res.status(SC.OK).json({
+								status: SC.OK,
+								message: "User Registered Successfully.",
+								token,
+								data: user
+							})
+						}
 					}
 					)
 					.catch(err => res.status(SC.BAD_REQUEST).json({
@@ -111,68 +146,6 @@ const signup = async (req, res) => {
 					}));
 			})
 		}
-		userModel.find({
-			$or: [
-				{ email: email },
-				{ phoneNumber: phoneNumber }
-			]
-		}).exec((err, user) => {
-			if (err) {
-				return res.status(SC.BAD_REQUEST).json({
-					status: SC.BAD_REQUEST,
-					error: "Something Went wrong"
-				});
-			}
-			if (user.length !== 0) {
-				return res.status(SC.BAD_REQUEST).json({
-					status: SC.BAD_REQUEST,
-					error: "Email or Phone Number already registered."
-				});
-			}
-			twilio.verify.v2.services(twilioServiceSID)
-				.verificationChecks
-				.create({ to: `${countryCode}${phoneNumber}`, code: otp })
-				.then(verification_check => {
-					if (verification_check.status === "approved") {
-						const user = new userModel(req.body)
-						user.save()
-							.then(user => {
-
-								const expiryTime = new Date()
-								expiryTime.setMonth(expiryTime.getMonth() + 6)
-								const exp = parseInt(expiryTime.getTime() / 1000)
-								const token = jwt.sign(
-									{ _id: user._id, exp: exp },
-									process.env.SECRET || 'college-predictor'
-								)
-								res.cookie('Token', token, { expire: new Date() + 9999 })
-								user.salt = undefined
-								user.__v = undefined
-
-								res.status(SC.OK).json({
-									status: SC.OK,
-									message: "User Registered Successfully.",
-									token,
-									data: user
-								})
-							}
-							)
-							.catch(err => res.status(SC.BAD_REQUEST).json({
-								status: SC.BAD_REQUEST,
-								message: err.message
-							}));
-					}
-					else {
-						return res.status(SC.BAD_REQUEST).json({
-							status: SC.BAD_REQUEST,
-							error: "Entered OTP is Invalid."
-						})
-					}
-				}).catch(err => res.status(err.status).json({
-					status: err.status,
-					error: { err }
-				}))
-		})
 	} catch (err) {
 		logger(err, 'ERROR')
 	} finally {

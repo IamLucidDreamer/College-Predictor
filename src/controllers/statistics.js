@@ -66,7 +66,44 @@ const callsStats = async (req, res) => {
     }
 }
 
+const refStats = async (req, res) => {
+    try {
+        const aggregation = [
+            {
+                $match: {
+                    referredBy: { $ne: null }, // Filter users who have referred someone
+                  },
+                },
+                  {
+                    $group: {
+                      _id: '$referredBy', // Group by referral code
+                      count: { $sum: 1 }, // Count users in each group
+                    },
+                  },
+                  {
+                    $lookup: {
+                      from: 'users', // The name of your User collection
+                      localField: '_id', // Referral code
+                      foreignField: 'referralCode', // Referral code in the user's table
+                      as: 'ownerDetails',
+                    },
+                  },
+          ];
+        const referrers = await userModel.aggregate(aggregation)
+        res.status(SC.OK).json({
+            status: SC.OK,
+            data: referrers
+        })
+    }
+    catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get Referral Stats is Executed!')
+    }
+}
+
 module.exports = {
     mainData,
-    callsStats
+    callsStats,
+    refStats
 }
