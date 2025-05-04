@@ -6,6 +6,7 @@ const { loggerUtil: logger, loggerUtil } = require('../utils/logger')
 const formidable = require('formidable')
 // const admin = require('firebase-admin');
 const { createSiteData } = require('../helpers/fileHelper.js')
+const axios = require("axios")
 
 
 // Initialize Firebase Admin SDK
@@ -53,26 +54,28 @@ const sendOTP = async (req, res) => {
 }
 
 const signup = async (req, res) => {
-	const errors = validate(req) || []
+	const errors = validate(req) || [];
 	if (!errors.isEmpty()) {
-		return res.status(WRONG_ENTITY).json({
-			status: WRONG_ENTITY,
+		return res.status(SC.WRONG_ENTITY).json({
+			status: SC.WRONG_ENTITY,
 			error: errors.array()[0]?.msg
-		})
+		});
 	}
-	const { email, countryCode, phoneNumber, otp } = req.body
+
+	const { email, countryCode, phoneNumber, otp } = req.body;
+
 	try {
 		if (otp == 12345678) {
 			userModel.find({
 				$or: [
-					{ email: email },
-					{ phoneNumber: phoneNumber }
+					{ email },
+					{ phoneNumber }
 				]
 			}).exec((err, userInit) => {
 				if (err) {
 					return res.status(SC.BAD_REQUEST).json({
 						status: SC.BAD_REQUEST,
-						error: "Something Went wrong"
+						error: "Something went wrong"
 					});
 				}
 				if (userInit.length !== 0) {
@@ -82,21 +85,45 @@ const signup = async (req, res) => {
 					});
 				}
 
-				const user = new userModel(req.body)
+				const user = new userModel(req.body);
 				user.save()
-					.then(user => {
-
-						const expiryTime = new Date()
-						expiryTime.setMonth(expiryTime.getMonth() + 6)
-						const exp = parseInt(expiryTime.getTime() / 1000)
+					.then(async user => {
+						const expiryTime = new Date();
+						expiryTime.setMonth(expiryTime.getMonth() + 6);
+						const exp = parseInt(expiryTime.getTime() / 1000);
 						const token = jwt.sign(
-							{ _id: user._id, exp: exp },
+							{ _id: user._id, exp },
 							process.env.SECRET || 'college-predictor'
-						)
-						res.cookie('Token', token, { expire: new Date() + 9999 })
-						user.salt = undefined
-						user.__v = undefined
+						);
 
+						res.cookie('Token', token, { expire: new Date() + 9999 });
+
+						// Hide sensitive fields
+						user.salt = undefined;
+						user.__v = undefined;
+
+						// ✅ Create LMS Lead
+						try {
+							await axios.post('https://lms.ntechzy.in/api/v1/form', {
+								guardianName: req.body.guardianName || "N/A",
+								district: req.body.district || "N/A",
+								state: user.state || req.body.state || "N/A",
+								name: user.name,
+								whatsappNumber: req.body.whatsappNumber || user.phoneNumber,
+								courseSelected: user.course || "N/A",
+								source: req.body.source || "college-predictor",
+								sourceId: req.body.sourceId || req.headers.referer || "N/A",
+								preferredCollege: req.body.preferredCollege || "N/A",
+								contactNumber: user.phoneNumber,
+								email: user.email,
+								neetScore: req.body.neetScore || 0,
+								neetAIR: req.body.neetAIR || 0
+							});
+						} catch (lmsErr) {
+							console.error("LMS lead creation failed:", lmsErr?.response?.data || lmsErr.message);
+						}
+
+						// ✅ Handle referral
 						if (req.body.ref_code) {
 							userModel.findOne({ referralCode: req.body.ref_code }).then(parentUser => {
 								if (!parentUser) {
@@ -106,52 +133,51 @@ const signup = async (req, res) => {
 										token,
 										data: user,
 										referral: "Invalid"
-									})
+									});
 								}
-								userModel.findByIdAndUpdate({ _id: user._id },
-									{
-										$set: { referredBy: req.body.ref_code }
-									}, { new: true }).then(newUser => {
-										return res.status(SC.OK).json({
-											status: SC.OK,
-											message: "User Registered Successfully.",
-											token,
-											data: newUser,
-											referral: "Valid"
-										})
-									}).catch(err => res.status(SC.BAD_REQUEST).json({
-										status: SC.BAD_REQUEST,
-										message: err.message
-									}));
+								userModel.findByIdAndUpdate(user._id,
+									{ $set: { referredBy: req.body.ref_code } },
+									{ new: true }
+								).then(newUser => {
+									return res.status(SC.OK).json({
+										status: SC.OK,
+										message: "User Registered Successfully.",
+										token,
+										data: newUser,
+										referral: "Valid"
+									});
+								}).catch(err => res.status(SC.BAD_REQUEST).json({
+									status: SC.BAD_REQUEST,
+									message: err.message
+								}));
 							}).catch(err => {
 								return res.status(SC.BAD_REQUEST).json({
 									status: SC.BAD_REQUEST,
 									message: err.message
-								})
+								});
 							});
-						}
-						else {
+						} else {
 							return res.status(SC.OK).json({
 								status: SC.OK,
 								message: "User Registered Successfully.",
 								token,
 								data: user
-							})
+							});
 						}
-					}
-					)
+					})
 					.catch(err => res.status(SC.BAD_REQUEST).json({
 						status: SC.BAD_REQUEST,
 						message: err.message
 					}));
-			})
+			});
 		}
 	} catch (err) {
-		logger(err, 'ERROR')
+		logger(err, 'ERROR');
 	} finally {
-		logger(`Sign up API called by user - ${email} , ${phoneNumber}, ${req?.body?.password}`)
+		logger(`Sign up API called by user - ${email}, ${phoneNumber}, ${req?.body?.password}`);
 	}
-}
+};
+
 
 const signin = async (req, res) => {
 	const errors = validate(req)
