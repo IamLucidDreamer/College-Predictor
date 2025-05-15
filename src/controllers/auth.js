@@ -116,7 +116,7 @@ const signup = async (req, res) => {
 								preferredCollege: req.body.preferredCollege || "N/A",
 								contactNumber: user.phoneNumber,
 								email: user.email,
-								neetScore: req.body.neetScore || 0,
+								neetScore: req.body.medicalMarks || 0,
 								neetAIR: req.body.neetAIR || 0
 							});
 						} catch (lmsErr) {
